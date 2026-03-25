@@ -37,6 +37,7 @@ from . import mcp_bridge
 from . import smart_organizer
 from . import system_perf
 from . import asset_importer
+from . import asset_exporter
 from . import procedural_geometry
 from . import text_voxelizer
 from . import verse_schema

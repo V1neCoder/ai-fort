@@ -1,0 +1,13 @@
+UEFN-specific rules:
+
+- Respect UEFN path system (no /Game/ assumptions)
+- Validate all placement logic against real editor behavior
+- Account for V2 device limitations
+- Use Verse when Python cannot set properties
+
+DO NOT:
+- Assume runtime behavior without verification
+- Generate invalid Verse code
+- Ignore editor constraints
+
+All UEFN changes must be logically testable in-editor.

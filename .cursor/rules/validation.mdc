@@ -1,0 +1,29 @@
+Validation enforcement:
+
+
+Validation must run automatically after every edit.
+
+This is not triggered by the user.
+This is part of the default workflow.
+
+If validation fails:
+→ Fix immediately
+→ Re-run validation
+
+Do not return unfinished work.
+
+Claude must ALWAYS validate outputs before completion.
+
+Checklist:
+- Alignment correct
+- No overlap
+- No floating geometry
+- Structure consistent
+- No broken logic paths
+
+If validation fails:
+→ Fix immediately
+→ Re-check
+
+Never return unfinished or unverified work.
+

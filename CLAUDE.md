@@ -209,3 +209,154 @@ git diff HEAD~1
 - Each project has its own CLAUDE.md — start there for project-specific guidance
 - Sub-projects may have upstream repos (agentscope, everything-claude-code) — check their original repos for broader context
 - Git history and commits are your reference for decisions and patterns
+
+---
+
+## AI Fort Agent System (Cursor + Claude Enhanced Stack)
+
+This workspace uses an enhanced AI agent workflow built on top of Cursor, Claude, and everything-claude-code.
+
+### Core Principle
+
+Claude must not operate as a one-pass generator. All tasks must follow a structured loop:
+
+Perceive → Plan → Edit → Validate → Fix → Confirm
+
+Claude should never mark work complete without validation.
+
+---
+
+## Required Agent Behavior
+
+Before making any changes:
+
+1. Read all relevant files for the task
+2. Build a mental model of the system
+3. Identify root cause (not symptoms)
+4. Propose a plan before editing
+
+During edits:
+
+- Only modify necessary files
+- Preserve existing working systems
+- Avoid large rewrites unless required
+- Keep diffs minimal and reversible
+
+After edits:
+
+- Run a validation pass
+- Check for unintended side effects
+- Summarize all changes clearly
+
+---
+
+## Validation Rules (MANDATORY)
+
+All generated or modified systems must pass:
+
+- No overlapping geometry
+- No floating structures
+- Proper alignment to grid / base
+- Roofs must match footprint and slope consistently
+- No clipping between assets
+- Consistent placement logic across systems
+
+If any validation fails:
+→ Claude must fix the issue before completing the task
+
+---
+
+## UEFN-Specific Intelligence Layer
+
+When working with UEFN systems:
+
+- Always account for editor constraints and quirks
+- Respect project mount path behavior
+- Do not assume `/Game/` paths
+- Validate all placement logic against real UEFN behavior
+
+For device logic:
+
+- Recognize V2 device limitations
+- Use Verse generation when properties cannot be set via Python
+- Ensure Verse output is clean, modular, and valid
+
+---
+
+## Repo Awareness + Safety
+
+Claude must treat this workspace as a monorepo:
+
+- Identify which subproject is being modified
+- Follow that project's CLAUDE.md before editing
+- Never mix logic across unrelated projects
+
+Before any commit suggestion:
+
+- List changed files
+- Explain purpose of each change
+- Identify potential risks
+- Generate a clean commit message
+
+---
+
+## Commit Format Enforcement
+
+Use structured commit messages:
+
+type(scope): description
+
+Examples:
+- fix(uefn-toolbelt): correct device schema validation
+- feat(electron-app): add asset preview panel
+- refactor(claude-plugin): reorganize agent hooks
+
+---
+
+## Cursor Agent Execution Rules
+
+When running in Cursor Agent mode:
+
+- Always scan project before answering
+- Do not hallucinate missing code
+- Ask for clarification if context is incomplete
+- Prefer reading files over guessing
+- Break complex tasks into steps
+
+---
+
+## Subagent Role Separation
+
+For complex tasks, Claude should internally separate responsibilities:
+
+- Architect → structure, layout, system design
+- Validator → detects errors and inconsistencies
+- Repo Guardian → ensures safe diffs and commit readiness
+- Verse Engineer → handles Verse-specific logic
+
+Claude should simulate this separation when reasoning through tasks.
+
+---
+
+## Failure Handling
+
+If Claude detects:
+
+- repeated mistakes
+- inconsistent outputs
+- unclear project structure
+
+It must:
+
+1. Stop
+2. Re-analyze the system
+3. Identify why the failure occurred
+4. Adjust approach before continuing
+
+---
+
+## Final Rule
+
+Claude must prioritize correctness over speed.
+
+A correct, validated, minimal fix is always better than a fast but flawed implementation.

@@ -1,0 +1,47 @@
+
+
+
+ALWAYS APPLY THIS WORKFLOW TO EVERY REQUEST.
+
+This is not optional.
+
+Execution pipeline:
+1. Read relevant files
+2. Identify root cause
+3. Plan before editing
+4. Make minimal fix
+5. Run validation
+6. Fix issues
+7. Summarize changes
+
+Never skip steps.
+Never mark complete without validation.
+You are working inside the AI Fort monorepo.
+
+MANDATORY EXECUTION FLOW:
+
+1. Read relevant files before making any change
+2. Identify root cause (not symptoms)
+3. Propose a plan BEFORE editing
+4. Make minimal, targeted changes
+5. Run validation checks
+6. Fix any detected issues
+7. Summarize changes
+
+DO NOT:
+- Guess project structure
+- Rewrite large systems unnecessarily
+- Mark tasks complete without validation
+
+VALIDATION RULES (ENFORCED):
+- No overlapping geometry
+- No floating objects
+- Roofs must align to base footprint and slope
+- No clipping between assets
+- Placement must be consistent
+
+If ANY rule fails:
+→ You MUST fix it before completing the task
+
+PRIORITY:
+Correctness > speed

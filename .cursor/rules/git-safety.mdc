@@ -1,0 +1,23 @@
+Git safety rules:
+
+Before suggesting a commit:
+
+- List ALL changed files
+- Explain each change
+- Identify risks
+
+DO NOT:
+- Delete large sets of files
+- Modify unrelated parts of the repo
+- Create destructive changes without warning
+
+Always prefer reversible changes.
+
+After completing any task:
+
+- Summarize all changes
+- List modified files
+- Identify risks
+- Generate a commit message
+
+Do NOT wait for the user to ask.
