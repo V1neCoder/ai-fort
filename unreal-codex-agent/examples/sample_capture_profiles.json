@@ -1,0 +1,112 @@
+{
+  "version": "1.0",
+  "profiles": {
+    "default_room": {
+      "max_images": 6,
+      "views": [
+        {
+          "name": "local_object",
+          "type": "2d",
+          "purpose": "object_focus"
+        },
+        {
+          "name": "room_context",
+          "type": "2d",
+          "purpose": "context"
+        },
+        {
+          "name": "left_angle",
+          "type": "2d",
+          "purpose": "side_check"
+        },
+        {
+          "name": "high_angle",
+          "type": "2d",
+          "purpose": "layout_check"
+        },
+        {
+          "name": "closeup_detail",
+          "type": "2d",
+          "purpose": "detail_check"
+        }
+      ],
+      "use_cube_capture_for_hard_cases": true,
+      "include_top_view": true,
+      "include_closeup": true,
+      "shell_crosscheck": false
+    },
+    "tight_interior": {
+      "max_images": 7,
+      "views": [
+        {
+          "name": "local_object",
+          "type": "2d",
+          "purpose": "object_focus"
+        },
+        {
+          "name": "front_context",
+          "type": "2d",
+          "purpose": "context"
+        },
+        {
+          "name": "right_angle",
+          "type": "2d",
+          "purpose": "side_check"
+        },
+        {
+          "name": "top_context",
+          "type": "2d",
+          "purpose": "layout_check"
+        },
+        {
+          "name": "closeup_detail",
+          "type": "2d",
+          "purpose": "detail_check"
+        }
+      ],
+      "use_cube_capture_for_hard_cases": true,
+      "include_top_view": true,
+      "include_closeup": true,
+      "shell_crosscheck": false
+    },
+    "shell_sensitive": {
+      "max_images": 8,
+      "views": [
+        {
+          "name": "local_object",
+          "type": "2d",
+          "purpose": "object_focus"
+        },
+        {
+          "name": "outside_context",
+          "type": "2d",
+          "purpose": "exterior_check"
+        },
+        {
+          "name": "inside_context",
+          "type": "2d",
+          "purpose": "interior_check"
+        },
+        {
+          "name": "cross_boundary",
+          "type": "2d",
+          "purpose": "shell_alignment"
+        },
+        {
+          "name": "high_angle",
+          "type": "2d",
+          "purpose": "layout_check"
+        },
+        {
+          "name": "closeup_detail",
+          "type": "2d",
+          "purpose": "detail_check"
+        }
+      ],
+      "use_cube_capture_for_hard_cases": true,
+      "include_top_view": true,
+      "include_closeup": true,
+      "shell_crosscheck": true
+    }
+  }
+}

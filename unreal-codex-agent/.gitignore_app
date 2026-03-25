@@ -1,0 +1,49 @@
+.env
+.env.local
+.env.*.local
+
+# Python
+.venv
+.env
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Electron
+app/electron/dist/
+app/electron/build/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+
+# Data files (keep structure, ignore content)
+data/**/*.json
+!data/.gitkeep
+!vendor/**
+
+# Temporary
+tmp/
+temp/
+*.tmp

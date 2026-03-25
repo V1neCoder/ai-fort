@@ -1,0 +1,95 @@
+{
+  "project_name": "unreal-codex-agent-demo",
+  "project_version": "0.2.0",
+  "environment": "development",
+  "default_room_type": "living_room",
+  "engine": {
+    "platform": "uefn",
+    "uefn_version": "current",
+    "units": "centimeters",
+    "supported_scripting_workflows": [
+      "verse_devices",
+      "fortnite_devices",
+      "scene_graph"
+    ],
+    "python_editor_script_plugin_required": false,
+    "remote_python_execution_required": false,
+    "scene_graph_beta": true
+  },
+  "paths": {
+    "data_dir": "./data",
+    "catalog_dir": "./data/catalog",
+    "catalog_db": "./data/catalog/asset_catalog.sqlite",
+    "catalog_jsonl": "./data/catalog/asset_catalog.jsonl",
+    "quarantine_jsonl": "./data/catalog/quarantine.jsonl",
+    "preview_dir": "./data/previews",
+    "session_dir": "./data/sessions",
+    "cache_dir": "./data/cache",
+    "log_dir": "./logs"
+  },
+  "scene_state": {
+    "backend": "uefn_session_export"
+  },
+  "uefn": {
+    "project_type": "uefn",
+    "scene_graph_enabled": true,
+    "scene_graph_beta": true,
+    "fortnite_devices_enabled": true,
+    "creative_devices_enabled": true,
+    "verse_root": "uefn/verse",
+    "generated_root": "uefn/verse/generated",
+    "export_root": "data/uefn_bridge"
+  },
+  "verse": {
+    "action_backend": "verse_device_export",
+    "generate_cycle_exports": true,
+    "device_strategy": "creative_device",
+    "scene_graph_strategy": "entity_component",
+    "fortnite_device_strategy": "authored_device_links"
+  },
+  "asset_ai": {
+    "enabled": true,
+    "force_rebuild_on_start": false,
+    "incremental_updates_enabled": true,
+    "min_trust_for_auto_place": 85,
+    "min_trust_for_shortlist": 70,
+    "quarantine_below_trust": 50,
+    "write_metadata_back_to_catalog": true,
+    "generate_preview_images": true,
+    "default_preview_width": 1024,
+    "default_preview_height": 1024
+  },
+  "capture": {
+    "enabled": true,
+    "backend": "auto",
+    "default_profile": "default_room",
+    "max_images_per_packet": 8,
+    "burst_capture_after_edit": true,
+    "save_packets": true
+  },
+  "integrations": {
+    "preferred_runtime": "uefn_verse",
+    "preferred_bridge": "uefn_verse",
+    "free_first_policy": true,
+    "preferred_building_tools": [
+      "fortnite_devices",
+      "scene_graph",
+      "verse",
+      "pcg_framework",
+      "prefabricator_ue5_reference_only"
+    ]
+  },
+  "validation": {
+    "enabled": true,
+    "max_auto_retries_per_zone": 4
+  },
+  "orchestrator": {
+    "auto_start": true,
+    "auto_create_session": true,
+    "session_name": "demo_session",
+    "save_action_history": true,
+    "save_score_history": true,
+    "use_undo_groups": true,
+    "max_zone_iterations": 6
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "required_tags": {
+    "category": [
+      "furniture",
+      "architecture",
+      "decor",
+      "lighting",
+      "plumbing",
+      "appliance",
+      "structural",
+      "opening",
+      "surface"
+    ],
+    "function": [
+      "seating",
+      "sleeping",
+      "storage",
+      "cooking",
+      "bathing",
+      "lighting",
+      "divider",
+      "access",
+      "surface",
+      "decoration",
+      "appliance",
+      "structure"
+    ],
+    "mount_type": [
+      "floor",
+      "wall",
+      "ceiling",
+      "surface",
+      "opening",
+      "corner",
+      "roof",
+      "exterior_ground"
+    ],
+    "scale_policy": [
+      "locked",
+      "tight",
+      "medium",
+      "wide"
+    ]
+  },
+  "recommended_tags": {
+    "styles": [
+      "modern",
+      "minimal",
+      "industrial",
+      "classic",
+      "rustic",
+      "scandinavian",
+      "luxury"
+    ],
+    "material_family": [
+      "wood",
+      "metal",
+      "glass",
+      "concrete",
+      "fabric",
+      "stone",
+      "ceramic"
+    ],
+    "placement_behavior": [
+      "against_wall",
+      "center_room",
+      "wall_aligned",
+      "hangs_from_ceiling",
+      "sits_on_surface",
+      "doorway_only",
+      "corner_friendly",
+      "shell_boundary"
+    ],
+    "repeatability": [
+      "high",
+      "medium",
+      "low"
+    ]
+  },
+  "boolean_tags": [
+    "shell_sensitive",
+    "corner_ok",
+    "against_wall_ok",
+    "requires_clearance",
+    "collision_required"
+  ],
+  "metadata_keys": [
+    "asset_ai.category",
+    "asset_ai.function",
+    "asset_ai.room_types",
+    "asset_ai.mount_type",
+    "asset_ai.scale_policy",
+    "asset_ai.styles",
+    "asset_ai.shell_sensitive",
+    "asset_ai.clearance_profile",
+    "asset_ai.trust_level",
+    "asset_ai.trust_score"
+  ]
+}

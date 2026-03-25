@@ -1,0 +1,66 @@
+{
+  "default": {
+    "clearance_min_cm": 45,
+    "collision_tolerance_cm": 2
+  },
+  "validators": {
+    "scale_sanity": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "clearance_rules": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "shell_alignment": {
+      "enabled": true,
+      "fail_hard": true,
+      "check_inside_outside_consistency": true
+    },
+    "repetition_rules": {
+      "enabled": true,
+      "fail_hard": false,
+      "max_same_focal_asset_per_room": 2,
+      "max_same_support_asset_per_room": 4
+    },
+    "collision_expectations": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "support_surface_fit": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "support_ownership": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "orientation_fit": {
+      "enabled": true,
+      "fail_hard": true,
+      "roll_pitch_tolerance_deg": 5.0
+    },
+    "registry_integrity": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "structure_functionality": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "placement_interference": {
+      "enabled": true,
+      "fail_hard": true
+    },
+    "room_fit": {
+      "enabled": true,
+      "fail_hard": true,
+      "require_room_type_match": true,
+      "require_mount_type_match": true
+    }
+  },
+  "completion_gate": {
+    "require_validator_pass": true,
+    "require_visual_review_pass": true
+  }
+}

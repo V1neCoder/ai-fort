@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "profiles": {
+    "sofa_standard": {
+      "allowed_surfaces": ["floor"],
+      "min_front_clearance_cm": 60,
+      "min_side_clearance_cm": 10,
+      "min_back_clearance_cm": 3,
+      "against_wall_ok": true,
+      "corner_ok": true,
+      "default_scale_policy": "tight"
+    },
+    "kitchen_counter": {
+      "allowed_surfaces": ["floor"],
+      "min_front_clearance_cm": 95,
+      "min_side_clearance_cm": 4,
+      "min_back_clearance_cm": 2,
+      "against_wall_ok": true,
+      "corner_ok": true,
+      "default_scale_policy": "locked"
+    },
+    "door_standard": {
+      "allowed_surfaces": ["opening"],
+      "shell_sensitive": true,
+      "default_scale_policy": "locked",
+      "preferred_yaw_step_deg": 90,
+      "snap_grid_cm": 10,
+      "requires_planar_alignment": true,
+      "allow_nonuniform_scale": false
+    },
+    "corner_structural": {
+      "allowed_surfaces": ["corner", "wall"],
+      "default_scale_policy": "locked",
+      "preferred_yaw_step_deg": 90,
+      "snap_grid_cm": 10,
+      "requires_corner_anchor": true,
+      "allow_nonuniform_scale": false
+    },
+    "roof_module": {
+      "allowed_surfaces": ["roof"],
+      "default_scale_policy": "locked",
+      "preferred_yaw_step_deg": 45,
+      "preferred_pitch_step_deg": 15,
+      "snap_grid_cm": 10,
+      "requires_planar_alignment": true,
+      "allow_nonuniform_scale": false
+    }
+  }
+}

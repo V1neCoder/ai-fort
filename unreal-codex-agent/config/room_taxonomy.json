@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "top_level_groups": {
+    "living": [
+      "living_room",
+      "lounge",
+      "family_room"
+    ],
+    "dining": [
+      "dining_room",
+      "breakfast_nook"
+    ],
+    "kitchen": [
+      "kitchen",
+      "pantry"
+    ],
+    "bedroom": [
+      "bedroom",
+      "guest_bedroom"
+    ],
+    "bathroom": [
+      "bathroom",
+      "powder_room",
+      "laundry_room"
+    ],
+    "circulation": [
+      "hallway",
+      "corridor",
+      "entryway",
+      "foyer"
+    ],
+    "exterior": [
+      "facade",
+      "balcony",
+      "patio",
+      "rooftop"
+    ],
+    "work": [
+      "office",
+      "studio",
+      "garage"
+    ]
+  },
+  "room_defaults": {
+    "living_room": {
+      "primary_functions": ["seating", "surface", "lighting", "storage", "decoration"],
+      "default_capture_profile": "default_room"
+    },
+    "kitchen": {
+      "primary_functions": ["cooking", "storage", "surface", "lighting", "appliance"],
+      "default_capture_profile": "tight_interior"
+    },
+    "bathroom": {
+      "primary_functions": ["bathing", "storage", "lighting", "plumbing"],
+      "default_capture_profile": "tight_interior"
+    },
+    "facade": {
+      "primary_functions": ["structure", "opening", "lighting", "decoration"],
+      "default_capture_profile": "shell_sensitive"
+    }
+  },
+  "aliases": {
+    "living": "living_room",
+    "family": "family_room",
+    "bed": "bedroom",
+    "bath": "bathroom",
+    "entry": "entryway",
+    "hall": "hallway"
+  }
+}

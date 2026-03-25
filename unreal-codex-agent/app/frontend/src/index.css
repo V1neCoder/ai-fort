@@ -1,0 +1,319 @@
+/* Global Styles */
+:root {
+    --primary-color: #3A3AFF;
+    --primary-dark: #1A1AFF;
+    --primary-light: #5555FF;
+    --bg-dark: #0F0F0F;
+    --bg-darker: #181818;
+    --bg-card: #212121;
+    --bg-input: #262626;
+    --text-primary: #FFFFFF;
+    --text-secondary: #CCCCCC;
+    --text-muted: #888888;
+    --border-color: #363636;
+    --success-color: #44FF88;
+    --error-color: #FF4444;
+    --warning-color: #FFAA44;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
+/* App Container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 0;
+    background-color: var(--bg-dark);
+}
+
+/* Header */
+.app-header {
+    background-color: var(--bg-darker);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    max-width: 100%;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.logo-icon {
+    color: var(--primary-color);
+}
+
+.nav-menu {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    background-color: var(--bg-input);
+    color: var(--primary-color);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background-color: var(--bg-input);
+    font-size: 0.875rem;
+}
+
+.status-icon {
+    width: 12px;
+    height: 12px;
+}
+
+.status-icon.connected {
+    color: var(--success-color);
+}
+
+.status-icon.disconnected {
+    color: var(--error-color);
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* Main Content — min-height allows flex child to receive height in Electron/Chromium */
+.app-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 2rem;
+    background-color: var(--bg-dark);
+}
+
+/* Home Page */
+.home-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.welcome-section {
+    margin-bottom: 2rem;
+}
+
+.welcome-section h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-section p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(58, 58, 255, 0.1);
+}
+
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(58, 58, 255, 0.1);
+    border-radius: 8px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.stat-icon .icon-success {
+    color: var(--success-color);
+}
+
+.stat-icon .icon-error {
+    color: var(--error-color);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.quick-actions h3 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background-color: var(--bg-darker);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.875rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.status-item .icon {
+    width: 16px;
+    height: 16px;
+}
+
+.status-item .label {
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 1rem;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .nav-menu.open {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background-color: var(--bg-darker);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        padding: 1rem;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .app-main {
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

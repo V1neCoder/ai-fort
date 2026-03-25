@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "baselines": {
+    "sofa_standard": {
+      "category": "furniture",
+      "function": "seating",
+      "expected_dimensions_cm": {
+        "width_min": 140,
+        "width_max": 280,
+        "depth_min": 70,
+        "depth_max": 120,
+        "height_min": 65,
+        "height_max": 110
+      },
+      "default_scale_limits": {
+        "min": 0.92,
+        "max": 1.08,
+        "preferred": 1.0
+      }
+    },
+    "kitchen_counter": {
+      "category": "surface",
+      "function": "surface",
+      "expected_dimensions_cm": {
+        "width_min": 80,
+        "width_max": 180,
+        "depth_min": 45,
+        "depth_max": 75,
+        "height_min": 85,
+        "height_max": 98
+      },
+      "default_scale_limits": {
+        "min": 1.0,
+        "max": 1.0,
+        "preferred": 1.0
+      }
+    },
+    "door_standard": {
+      "category": "opening",
+      "function": "access",
+      "expected_dimensions_cm": {
+        "width_min": 70,
+        "width_max": 120,
+        "depth_min": 3,
+        "depth_max": 20,
+        "height_min": 190,
+        "height_max": 240
+      },
+      "default_scale_limits": {
+        "min": 1.0,
+        "max": 1.0,
+        "preferred": 1.0
+      }
+    },
+    "corner_structural": {
+      "category": "structural",
+      "function": "structure",
+      "expected_dimensions_cm": {
+        "width_min": 20,
+        "width_max": 400,
+        "depth_min": 20,
+        "depth_max": 400,
+        "height_min": 40,
+        "height_max": 600
+      },
+      "default_scale_limits": {
+        "min": 1.0,
+        "max": 1.0,
+        "preferred": 1.0
+      }
+    },
+    "roof_module": {
+      "category": "structural",
+      "function": "structure",
+      "expected_dimensions_cm": {
+        "width_min": 40,
+        "width_max": 600,
+        "depth_min": 40,
+        "depth_max": 600,
+        "height_min": 10,
+        "height_max": 300
+      },
+      "default_scale_limits": {
+        "min": 1.0,
+        "max": 1.0,
+        "preferred": 1.0
+      }
+    }
+  }
+}

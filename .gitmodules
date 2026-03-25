@@ -1,0 +1,12 @@
+[submodule "agentscope"]
+	path = agentscope
+	url = https://github.com/agentscope-ai/agentscope.git
+[submodule "everything-claude-code"]
+	path = everything-claude-code
+	url = https://github.com/affaan-m/everything-claude-code.git
+[submodule "UEFN-TOOLBELT-latest"]
+	path = UEFN-TOOLBELT-latest
+	url = https://github.com/undergroundrap/UEFN-TOOLBELT.git
+[submodule "editor-reference"]
+	path = editor-reference
+	url = https://github.com/pascalorg/editor.git

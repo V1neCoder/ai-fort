@@ -1,0 +1,30 @@
+{
+  "date": "2026-03-24",
+  "providers": {
+    "groq": {
+      "requests": 22,
+      "tokens_in": 2668,
+      "tokens_out": 2804
+    },
+    "cerebras": {
+      "requests": 32,
+      "tokens_in": 546833,
+      "tokens_out": 10777
+    },
+    "gemini": {
+      "requests": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    "ollama": {
+      "requests": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    "openai": {
+      "requests": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  }
+}
