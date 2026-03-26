@@ -1,0 +1,58 @@
+{
+  "asset_id": "5fbb8659e376",
+  "name": "modern_house_005",
+  "category": "architecture",
+  "project": "default",
+  "prompt": "create me a house",
+  "spec": {
+    "prompt": "create me a house",
+    "asset_name": "modern_house",
+    "category": "architecture",
+    "purpose": "residential building",
+    "required_components": [
+      "walls",
+      "roof",
+      "doors",
+      "windows"
+    ],
+    "expected_silhouette": "rectangular with triangular or flat roof",
+    "scale_range_cm": {
+      "min_width": 600,
+      "max_width": 1200,
+      "min_height": 300,
+      "max_height": 800,
+      "min_depth": 400,
+      "max_depth": 1000
+    },
+    "interior_required": true,
+    "failure_conditions": [
+      "no walls",
+      "no roof",
+      "no doors or windows"
+    ],
+    "style": "modern",
+    "color_palette": [
+      "#FFFFFF",
+      "#808080",
+      "#454545"
+    ]
+  },
+  "version": 1,
+  "status": "generating",
+  "created_at": "2026-03-26T05:53:46.685448+00:00",
+  "updated_at": "2026-03-26T05:53:46.688243+00:00",
+  "glb_path": "",
+  "preview_screenshots": [],
+  "generated_code": "",
+  "validation_results": [],
+  "fix_history": [],
+  "latest_validation": {},
+  "uefn_import_path": "",
+  "imported_at": "",
+  "reference_images": [],
+  "tags": [],
+  "generation_provider": "",
+  "vertex_count": 0,
+  "face_count": 0,
+  "bounds_cm": {}
+}

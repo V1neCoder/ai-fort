@@ -1,0 +1,22 @@
+[
+  {
+    "id": "dd9202125b44",
+    "name": "Modern House 003",
+    "type": "architecture",
+    "category": "architecture",
+    "description": "create a modern house",
+    "tags": [
+      "modern",
+      "architecture",
+      "ai-generated"
+    ],
+    "dimensions": {},
+    "trust_score": 0.0,
+    "composite_asset": false,
+    "viewer_model_url": "",
+    "viewer_note": "AI Generated v1 — approved",
+    "pipeline_asset": true,
+    "pipeline_id": "dd9202125b44",
+    "pipeline_status": "approved"
+  }
+]
