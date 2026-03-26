@@ -1,0 +1,31 @@
+{
+  "prompt": "create a  crate",
+  "asset_name": "wooden_crate",
+  "category": "prop",
+  "purpose": "storage or shipping container",
+  "required_components": [
+    "base",
+    "sides",
+    "top"
+  ],
+  "expected_silhouette": "rectangular box",
+  "scale_range_cm": {
+    "min_width": 40,
+    "max_width": 120,
+    "min_height": 30,
+    "max_height": 90,
+    "min_depth": 40,
+    "max_depth": 120
+  },
+  "interior_required": false,
+  "failure_conditions": [
+    "incorrect proportions",
+    "missing or deformed components"
+  ],
+  "style": "rustic",
+  "color_palette": [
+    "#964B00",
+    "#663300",
+    "#452B1F"
+  ]
+}

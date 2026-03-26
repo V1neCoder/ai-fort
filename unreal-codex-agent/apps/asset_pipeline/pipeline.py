@@ -165,7 +165,6 @@ class AssetPipeline:
                     checks=[],
                     issues=[f"Validation error: {e}"],
                     recommendations=[],
-                    vision_provider="none",
                 )
 
             record = self.registry.update_validation(record, validation)

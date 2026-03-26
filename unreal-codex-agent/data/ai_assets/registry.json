@@ -519,6 +519,80 @@
       "vertex_count": 0,
       "face_count": 0,
       "bounds_cm": {}
+    },
+    {
+      "asset_id": "6bf39baae7e0",
+      "name": "wooden_crate",
+      "category": "prop",
+      "project": "default",
+      "prompt": "create a  crate",
+      "spec": {
+        "prompt": "create a  crate",
+        "asset_name": "wooden_crate",
+        "category": "prop",
+        "purpose": "storage or shipping container",
+        "required_components": [
+          "base",
+          "sides",
+          "top"
+        ],
+        "expected_silhouette": "rectangular box",
+        "scale_range_cm": {
+          "min_width": 40,
+          "max_width": 120,
+          "min_height": 30,
+          "max_height": 90,
+          "min_depth": 40,
+          "max_depth": 120
+        },
+        "interior_required": false,
+        "failure_conditions": [
+          "incorrect proportions",
+          "missing or deformed components"
+        ],
+        "style": "rustic",
+        "color_palette": [
+          "#964B00",
+          "#663300",
+          "#452B1F"
+        ]
+      },
+      "version": 1,
+      "status": "validating",
+      "created_at": "2026-03-26T06:16:04.466256+00:00",
+      "updated_at": "2026-03-26T06:16:06.993148+00:00",
+      "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\wooden_crate\\exports\\wooden_crate_v1.glb",
+      "preview_screenshots": [
+        "v1_placeholder.png"
+      ],
+      "generated_code": "import trimesh\nimport numpy as np\n\n# Create the scene\nscene = trimesh.Scene()\n\n# Base\nbase = trimesh.creation.box(extents=[80, 80, 5])\nbase.visual.face_colors = [150, 100, 50, 255]  # #964B00\nscene.add_geometry(base, node_name=\"base\")\n\n# Sides\nsides = []\nfor i in range(4):\n    side = trimesh.creation.box(extents=[80, 5, 60])\n    if i == 0:\n        side.apply_translation([0, 0, 5])\n    elif i == 1:\n        side.apply_translation([80, 0, 5])\n        side.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [0, 0, 1]))\n    elif i == 2:\n        side.apply_translation([0, 80, 5])\n    elif i == 3:\n        side.apply_translation([-80, 0, 5])\n        side.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [0, 0, 1]))\n    side.visual.face_colors = [100, 75, 30, 255]  # #663300\n    scene.add_geometry(side, node_name=f\"side_{i}\")\n\n# Top\ntop = trimesh.creation.box(extents=[80, 80, 5])\ntop.apply_translation([0, 0, 70])\ntop.visual.face_colors = [70, 45, 30, 255]  # #452B1F\nscene.add_geometry(top, node_name=\"top\")",
+      "validation_results": [],
+      "fix_history": [],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "free_ai",
+      "vertex_count": 48,
+      "face_count": 72,
+      "bounds_cm": {
+        "min": [
+          -40.0,
+          -120.0,
+          -25.0
+        ],
+        "max": [
+          40.0,
+          120.0,
+          72.5
+        ],
+        "size": [
+          80.0,
+          240.0,
+          97.5
+        ]
+      }
     }
   ]
 }
