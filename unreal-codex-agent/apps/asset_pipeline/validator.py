@@ -71,7 +71,6 @@ def validate_asset(
         checks=all_checks,
         issues=issues,
         recommendations=recommendations,
-        vision_provider=vision_checks.get("provider", "none") if vision_checks else "none",
     )
 
 

@@ -1,0 +1,94 @@
+{
+  "asset_id": "af2a976bdfe8",
+  "name": "red_car",
+  "category": "vehicle",
+  "project": "default",
+  "prompt": "generate a red carr",
+  "spec": {
+    "prompt": "generate a red carr",
+    "asset_name": "red_car",
+    "category": "vehicle",
+    "purpose": "drivable vehicle for game environment",
+    "required_components": [
+      "body",
+      "wheels",
+      "windows",
+      "doors"
+    ],
+    "expected_silhouette": "compact sedan shape",
+    "scale_range_cm": {
+      "min_width": 350,
+      "max_width": 450,
+      "min_height": 100,
+      "max_height": 150,
+      "min_depth": 450,
+      "max_depth": 550
+    },
+    "interior_required": true,
+    "failure_conditions": [
+      "missing wheels",
+      "incorrect scale",
+      "non-vehicle shape"
+    ],
+    "style": "modern",
+    "color_palette": [
+      "#FF0000",
+      "#FFFFFF",
+      "#000000"
+    ]
+  },
+  "version": 1,
+  "status": "approved",
+  "created_at": "2026-03-26T17:54:44.358989+00:00",
+  "updated_at": "2026-03-26T17:54:50.502943+00:00",
+  "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\red_car\\exports\\red_car_v1.glb",
+  "preview_screenshots": [
+    "v1_placeholder.png"
+  ],
+  "generated_code": "import trimesh\nimport numpy as np\nfrom trimesh.transformations import translation_matrix, rotation_matrix\n\n# Body\nbody = trimesh.creation.box(extents=[400, 500, 120])\nbody.apply_scale([1, 1, 0.8])  # adjust proportions\nbody.apply_translation([0, 0, -60])  # lower body\nbody.visual.face_colors = [255, 0, 0, 255]  # red\n\n# Hollow interior\ninterior = trimesh.creation.box(extents=[360, 460, 80])\ninterior.apply_translation([0, 0, -60])  # align with body\ninterior.apply_scale([1, 1, 0.8])  # adjust proportions\ntry:\n    body = trimesh.boolean.difference([body, interior], engine=\"manifold\")\nexcept Exception:\n    pass  # fallback if boolean operation fails\n\n# Wheels\nwheel = trimesh.creation.cylinder(radius=40, height=80, sections=32)\nwheel.apply_scale([1, 1, 0.5])  # adjust thickness\nwheel.apply_translation([170, 220, -120])  # front left\nwheel.visual.face_colors = [0, 0, 0, 255]  # black\nwheel2 = wheel.copy()\nwheel2.apply_translation([-170, 220, 0])  # front right\nwheel3 = wheel.copy()\nwheel3.apply_translation([170, -220, 0])  # rear left\nwheel4 = wheel.copy()\nwheel4.apply_translation([-170, -220, 0])  # rear right\n\n# Windows\nwindow = trimesh.creation.box(extents=[100, 50, 20])\nwindow.apply_translation([0, 150, 20])  # front\nwindow.visual.face_colors = [255, 255, 255, 128]  # white transparent\nwindow2 = window.copy()\nwindow2.apply_translation([0, -150, 0])  # rear\n\n# Doors\ndoor = trimesh.creation.box(extents=[80, 20, 100])\ndoor.apply_translation([150, 0, 0])  # front\ndoor.visual.face_colors = [255, 0, 0, 255]  # red\ndoor2 = door.copy()\ndoor2.apply_translation([-150, 0, 0])  # rear\n\n# Scene\nscene = trimesh.Scene()\nscene.add_geometry(body, node_name=\"body\")\nscene.add_geometry(wheel, node_name=\"wheel_front_left\")\nscene.add_geometry(wheel2, node_name=\"wheel_front_right\")\nscene.add_geometry(wheel3, node_name=\"wheel_rear_left\")\nscene.add_geometry(wheel4, node_name=\"wheel_rear_right\")\nscene.add_geometry(window, node_name=\"window_front\")\nscene.add_geometry(window2, node_name=\"window_rear\")\nscene.add_geometry(door, node_name=\"door_front\")\nscene.add_geometry(door2, node_name=\"door_rear\")",
+  "validation_results": [
+    {
+      "passed": true,
+      "overall_score": 0.5,
+      "checks": [],
+      "issues": [
+        "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+      ],
+      "recommendations": []
+    }
+  ],
+  "fix_history": [],
+  "latest_validation": {
+    "passed": true,
+    "overall_score": 0.5,
+    "checks": [],
+    "issues": [
+      "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+    ],
+    "recommendations": []
+  },
+  "uefn_import_path": "",
+  "imported_at": "",
+  "reference_images": [],
+  "tags": [],
+  "generation_provider": "free_ai",
+  "vertex_count": 304,
+  "face_count": 572,
+  "bounds_cm": {
+    "min": [
+      -200.0,
+      -250.0,
+      -140.0
+    ],
+    "max": [
+      380.0,
+      480.0,
+      50.0
+    ],
+    "size": [
+      580.0,
+      730.0,
+      190.0
+    ]
+  }
+}

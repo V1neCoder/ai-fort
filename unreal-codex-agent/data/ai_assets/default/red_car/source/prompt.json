@@ -1,0 +1,33 @@
+{
+  "prompt": "generate a red carr",
+  "asset_name": "red_car",
+  "category": "vehicle",
+  "purpose": "drivable vehicle for game environment",
+  "required_components": [
+    "body",
+    "wheels",
+    "windows",
+    "doors"
+  ],
+  "expected_silhouette": "compact sedan shape",
+  "scale_range_cm": {
+    "min_width": 350,
+    "max_width": 450,
+    "min_height": 100,
+    "max_height": 150,
+    "min_depth": 450,
+    "max_depth": 550
+  },
+  "interior_required": true,
+  "failure_conditions": [
+    "missing wheels",
+    "incorrect scale",
+    "non-vehicle shape"
+  ],
+  "style": "modern",
+  "color_palette": [
+    "#FF0000",
+    "#FFFFFF",
+    "#000000"
+  ]
+}

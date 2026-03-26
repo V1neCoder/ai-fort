@@ -1,0 +1,96 @@
+{
+  "asset_id": "e9d453e5d7aa",
+  "name": "luxury_mansion",
+  "category": "architecture",
+  "project": "default",
+  "prompt": "create a mansion",
+  "spec": {
+    "prompt": "create a mansion",
+    "asset_name": "luxury_mansion",
+    "category": "architecture",
+    "purpose": "main residence for a wealthy family",
+    "required_components": [
+      "main_building",
+      "garage",
+      "garden",
+      "pool",
+      "fountains"
+    ],
+    "expected_silhouette": "large, sprawling structure with multiple wings and towers",
+    "scale_range_cm": {
+      "min_width": 1500,
+      "max_width": 3000,
+      "min_height": 800,
+      "max_height": 1200,
+      "min_depth": 1000,
+      "max_depth": 2000
+    },
+    "interior_required": true,
+    "failure_conditions": [
+      "too small",
+      "lacking ornate details",
+      "inconsistent architectural style"
+    ],
+    "style": "luxury",
+    "color_palette": [
+      "#FFFFFF",
+      "#808080",
+      "#964B00",
+      "#008000"
+    ]
+  },
+  "version": 1,
+  "status": "approved",
+  "created_at": "2026-03-26T06:32:02.184831+00:00",
+  "updated_at": "2026-03-26T06:32:10.090049+00:00",
+  "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\luxury_mansion\\exports\\luxury_mansion_v1.glb",
+  "preview_screenshots": [
+    "v1_placeholder.png"
+  ],
+  "generated_code": "import trimesh\nimport numpy as np\n\n# Create the scene\nscene = trimesh.Scene()\n\n# Main building (hollow box)\nouter_main = trimesh.creation.box(extents=[2000, 1500, 800])\nouter_main.apply_translation([0, 0, 400])\ninner_main = trimesh.creation.box(extents=[1800, 1300, 700])\ninner_main.apply_translation([0, 0, 350])\ntry:\n    main_building = trimesh.boolean.difference([outer_main, inner_main], engine=\"manifold\")\nexcept Exception:\n    main_building = outer_main  # fallback if boolean fails\nmain_building.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(main_building, node_name=\"main_building\")\n\n# Garage (hollow box)\nouter_garage = trimesh.creation.box(extents=[500, 300, 400])\nouter_garage.apply_translation([-700, -200, 200])\ninner_garage = trimesh.creation.box(extents=[450, 250, 350])\ninner_garage.apply_translation([-700, -200, 150])\ntry:\n    garage = trimesh.boolean.difference([outer_garage, inner_garage], engine=\"manifold\")\nexcept Exception:\n    garage = outer_garage  # fallback if boolean fails\ngarage.visual.face_colors = [128, 128, 128, 255]  # Gray\nscene.add_geometry(garage, node_name=\"garage\")\n\n# Garden (flat rectangle)\ngarden = trimesh.creation.box(extents=[1000, 500, 10])\ngarden.apply_translation([0, 500, 0])\ngarden.visual.face_colors = [0, 128, 0, 255]  # Green\nscene.add_geometry(garden, node_name=\"garden\")\n\n# Pool (flat rectangle)\npool = trimesh.creation.box(extents=[400, 200, 10])\npool.apply_translation([300, 200, 0])\npool.visual.face_colors = [0, 0, 255, 128]  # Blue\nscene.add_geometry(pool, node_name=\"pool\")\n\n# Fountains (small cylinders)\nfountain1 = trimesh.creation.cylinder(radius=20, height=50, sections=32)\nfountain1.apply_translation([0, 0, 25])\nfountain1.visual.face_colors = [139, 69, 19, 255]  # Brown\nscene.add_geometry(fountain1, node_name=\"fountain1\")\n\nfountain2 = trimesh.creation.cylinder(radius=20, height=50, sections=32)\nfountain2.apply_translation([500, 0, 25])\nfountain2.visual.face_colors = [139, 69, 19, 255]  # Brown\nscene.add_geometry(fountain2, node_name=\"fountain2\")\n\n# Towers (small cylinders)\ntower1 = trimesh.creation.cylinder(radius=50, height=200, sections=32)\ntower1.apply_translation([-500, 0, 100])\ntower1.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(tower1, node_name=\"tower1\")\n\ntower2 = trimesh.creation.cylinder(radius=50, height=200, sections=32)\ntower2.apply_translation([500, 0, 100])\ntower2.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(tower2, node_name=\"tower2\")",
+  "validation_results": [
+    {
+      "passed": true,
+      "overall_score": 0.5,
+      "checks": [],
+      "issues": [
+        "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+      ],
+      "recommendations": []
+    }
+  ],
+  "fix_history": [],
+  "latest_validation": {
+    "passed": true,
+    "overall_score": 0.5,
+    "checks": [],
+    "issues": [
+      "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+    ],
+    "recommendations": []
+  },
+  "uefn_import_path": "",
+  "imported_at": "",
+  "reference_images": [],
+  "tags": [],
+  "generation_provider": "free_ai",
+  "vertex_count": 296,
+  "face_count": 560,
+  "bounds_cm": {
+    "min": [
+      -1000.0,
+      -750.0,
+      -5.0
+    ],
+    "max": [
+      1000.0,
+      750.0,
+      800.0
+    ],
+    "size": [
+      2000.0,
+      1500.0,
+      805.0
+    ]
+  }
+}

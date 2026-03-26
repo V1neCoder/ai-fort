@@ -6,9 +6,9 @@
     "category": "architecture",
     "description": "create a modern house",
     "tags": [
-      "architecture",
+      "ai-generated",
       "modern",
-      "ai-generated"
+      "architecture"
     ],
     "dimensions": {},
     "trust_score": 0.0,
@@ -26,9 +26,9 @@
     "category": "prop",
     "description": "create a  crate",
     "tags": [
+      "ai-generated",
       "prop",
-      "rustic",
-      "ai-generated"
+      "rustic"
     ],
     "dimensions": {
       "min": [
@@ -62,9 +62,9 @@
     "category": "prop",
     "description": "create  a crate",
     "tags": [
+      "ai-generated",
       "prop",
-      "rustic",
-      "ai-generated"
+      "rustic"
     ],
     "dimensions": {
       "min": [
@@ -92,39 +92,75 @@
     "pipeline_status": "approved"
   },
   {
-    "id": "4ddb19d77248",
-    "name": "Wooden Crate 005",
-    "type": "prop",
-    "category": "prop",
-    "description": "create  a  crate",
+    "id": "e9d453e5d7aa",
+    "name": "Luxury Mansion",
+    "type": "architecture",
+    "category": "architecture",
+    "description": "create a mansion",
     "tags": [
-      "prop",
-      "rustic",
-      "ai-generated"
+      "ai-generated",
+      "luxury",
+      "architecture"
     ],
     "dimensions": {
       "min": [
-        -35.0,
-        -35.0,
-        -2.5
+        -1000.0,
+        -750.0,
+        -5.0
       ],
       "max": [
-        30.0,
-        30.0,
-        57.5
+        1000.0,
+        750.0,
+        800.0
       ],
       "size": [
-        65.0,
-        65.0,
-        60.0
+        2000.0,
+        1500.0,
+        805.0
       ]
     },
     "trust_score": 0.5,
     "composite_asset": false,
-    "viewer_model_url": "/ai_assets/default/wooden_crate_005/exports/wooden_crate_005_v1.glb",
+    "viewer_model_url": "/ai_assets/default/luxury_mansion/exports/luxury_mansion_v1.glb",
     "viewer_note": "AI Generated v1 — approved",
     "pipeline_asset": true,
-    "pipeline_id": "4ddb19d77248",
+    "pipeline_id": "e9d453e5d7aa",
+    "pipeline_status": "approved"
+  },
+  {
+    "id": "af2a976bdfe8",
+    "name": "Red Car",
+    "type": "vehicle",
+    "category": "vehicle",
+    "description": "generate a red carr",
+    "tags": [
+      "vehicle",
+      "modern",
+      "ai-generated"
+    ],
+    "dimensions": {
+      "min": [
+        -200.0,
+        -250.0,
+        -140.0
+      ],
+      "max": [
+        380.0,
+        480.0,
+        50.0
+      ],
+      "size": [
+        580.0,
+        730.0,
+        190.0
+      ]
+    },
+    "trust_score": 0.5,
+    "composite_asset": false,
+    "viewer_model_url": "/ai_assets/default/red_car/exports/red_car_v1.glb",
+    "viewer_note": "AI Generated v1 — approved",
+    "pipeline_asset": true,
+    "pipeline_id": "af2a976bdfe8",
     "pipeline_status": "approved"
   }
 ]

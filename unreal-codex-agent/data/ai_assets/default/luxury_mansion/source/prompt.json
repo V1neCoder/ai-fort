@@ -1,0 +1,35 @@
+{
+  "prompt": "create a mansion",
+  "asset_name": "luxury_mansion",
+  "category": "architecture",
+  "purpose": "main residence for a wealthy family",
+  "required_components": [
+    "main_building",
+    "garage",
+    "garden",
+    "pool",
+    "fountains"
+  ],
+  "expected_silhouette": "large, sprawling structure with multiple wings and towers",
+  "scale_range_cm": {
+    "min_width": 1500,
+    "max_width": 3000,
+    "min_height": 800,
+    "max_height": 1200,
+    "min_depth": 1000,
+    "max_depth": 2000
+  },
+  "interior_required": true,
+  "failure_conditions": [
+    "too small",
+    "lacking ornate details",
+    "inconsistent architectural style"
+  ],
+  "style": "luxury",
+  "color_palette": [
+    "#FFFFFF",
+    "#808080",
+    "#964B00",
+    "#008000"
+  ]
+}

@@ -360,3 +360,46 @@ It must:
 Claude must prioritize correctness over speed.
 
 A correct, validated, minimal fix is always better than a fast but flawed implementation.
+
+---
+## Today (2026-03-26): Uncommitted Repo Changes
+
+The following reflect the current working-tree state (from `git status --porcelain`) and are not committed yet.
+
+Deleted (`D`):
+- unreal-codex-agent/data/ai_assets/default/wooden_crate/exports/wooden_crate_v1.glb
+- unreal-codex-agent/data/ai_assets/default/wooden_crate/metadata/record.json
+- unreal-codex-agent/data/ai_assets/default/wooden_crate/previews/v1_placeholder.png
+- unreal-codex-agent/data/ai_assets/default/wooden_crate/source/prompt.json
+- unreal-codex-agent/data/ai_assets/default/wooden_crate/source/v1_code.py
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/exports/wooden_crate_005_v1.glb
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/metadata/record.json
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/previews/v1_placeholder.png
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/source/prompt.json
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/source/v1_code.py
+- unreal-codex-agent/data/ai_assets/default/wooden_crate_005/validation/v1_result.json
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/f_000017
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/f_00001a
+
+Modified (`M`):
+- unreal-codex-agent/data/ai_assets/registry.json
+- unreal-codex-agent/data/catalog/shortlist.json
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/data_0
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/data_1
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/data_2
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/data_3
+- `unreal-codex-agent/data/electron_runtime/cache/Code Cache/js/53cfa7bcdb2af8af_0`
+- `unreal-codex-agent/data/electron_runtime/cache/Code Cache/js/index-dir/the-real-index`
+- unreal-codex-agent/data/electron_runtime/cache/GPUCache/data_1
+- `unreal-codex-agent/data/electron_runtime/cache/Local Storage/leveldb/LOG`
+- `unreal-codex-agent/data/electron_runtime/cache/Local Storage/leveldb/LOG.old`
+- `unreal-codex-agent/data/electron_runtime/cache/Session Storage/LOG`
+- `unreal-codex-agent/data/electron_runtime/cache/Session Storage/LOG.old`
+- unreal-codex-agent/vendor/uefn-mcp-server
+
+Untracked (`??`):
+- unreal-codex-agent/data/ai_assets/default/luxury_mansion/
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/f_00001c
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/f_00001e
+- unreal-codex-agent/data/electron_runtime/cache/Cache/Cache_Data/f_00002f
+- `unreal-codex-agent/data/electron_runtime/cache/Code Cache/js/5719fe40bc1e43c1_0`

@@ -177,67 +177,6 @@
       "bounds_cm": {}
     },
     {
-      "asset_id": "1bc6fcc7432a",
-      "name": "modern_house_004",
-      "category": "architecture",
-      "project": "default",
-      "prompt": "create  a  modern  house",
-      "spec": {
-        "prompt": "create  a  modern  house",
-        "asset_name": "modern_house",
-        "category": "architecture",
-        "purpose": "residential building",
-        "required_components": [
-          "walls",
-          "roof",
-          "doors",
-          "windows",
-          "foundation"
-        ],
-        "expected_silhouette": "rectangular with sloping roof",
-        "scale_range_cm": {
-          "min_width": 600,
-          "max_width": 1200,
-          "min_height": 300,
-          "max_height": 600,
-          "min_depth": 400,
-          "max_depth": 800
-        },
-        "interior_required": true,
-        "failure_conditions": [
-          "too small",
-          "no windows",
-          "no doors",
-          "unrealistic proportions"
-        ],
-        "style": "modern",
-        "color_palette": [
-          "#FFFFFF",
-          "#808080",
-          "#454545",
-          "#66CCCC"
-        ]
-      },
-      "version": 1,
-      "status": "generating",
-      "created_at": "2026-03-26T05:52:51.920056+00:00",
-      "updated_at": "2026-03-26T05:52:51.922454+00:00",
-      "glb_path": "",
-      "preview_screenshots": [],
-      "generated_code": "",
-      "validation_results": [],
-      "fix_history": [],
-      "latest_validation": {},
-      "uefn_import_path": "",
-      "imported_at": "",
-      "reference_images": [],
-      "tags": [],
-      "generation_provider": "",
-      "vertex_count": 0,
-      "face_count": 0,
-      "bounds_cm": {}
-    },
-    {
       "asset_id": "5fbb8659e376",
       "name": "modern_house_005",
       "category": "architecture",
@@ -521,80 +460,6 @@
       "bounds_cm": {}
     },
     {
-      "asset_id": "6bf39baae7e0",
-      "name": "wooden_crate",
-      "category": "prop",
-      "project": "default",
-      "prompt": "create a  crate",
-      "spec": {
-        "prompt": "create a  crate",
-        "asset_name": "wooden_crate",
-        "category": "prop",
-        "purpose": "storage or shipping container",
-        "required_components": [
-          "base",
-          "sides",
-          "top"
-        ],
-        "expected_silhouette": "rectangular box",
-        "scale_range_cm": {
-          "min_width": 40,
-          "max_width": 120,
-          "min_height": 30,
-          "max_height": 90,
-          "min_depth": 40,
-          "max_depth": 120
-        },
-        "interior_required": false,
-        "failure_conditions": [
-          "incorrect proportions",
-          "missing or deformed components"
-        ],
-        "style": "rustic",
-        "color_palette": [
-          "#964B00",
-          "#663300",
-          "#452B1F"
-        ]
-      },
-      "version": 1,
-      "status": "validating",
-      "created_at": "2026-03-26T06:16:04.466256+00:00",
-      "updated_at": "2026-03-26T06:16:06.993148+00:00",
-      "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\wooden_crate\\exports\\wooden_crate_v1.glb",
-      "preview_screenshots": [
-        "v1_placeholder.png"
-      ],
-      "generated_code": "import trimesh\nimport numpy as np\n\n# Create the scene\nscene = trimesh.Scene()\n\n# Base\nbase = trimesh.creation.box(extents=[80, 80, 5])\nbase.visual.face_colors = [150, 100, 50, 255]  # #964B00\nscene.add_geometry(base, node_name=\"base\")\n\n# Sides\nsides = []\nfor i in range(4):\n    side = trimesh.creation.box(extents=[80, 5, 60])\n    if i == 0:\n        side.apply_translation([0, 0, 5])\n    elif i == 1:\n        side.apply_translation([80, 0, 5])\n        side.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [0, 0, 1]))\n    elif i == 2:\n        side.apply_translation([0, 80, 5])\n    elif i == 3:\n        side.apply_translation([-80, 0, 5])\n        side.apply_transform(trimesh.transformations.rotation_matrix(np.pi/2, [0, 0, 1]))\n    side.visual.face_colors = [100, 75, 30, 255]  # #663300\n    scene.add_geometry(side, node_name=f\"side_{i}\")\n\n# Top\ntop = trimesh.creation.box(extents=[80, 80, 5])\ntop.apply_translation([0, 0, 70])\ntop.visual.face_colors = [70, 45, 30, 255]  # #452B1F\nscene.add_geometry(top, node_name=\"top\")",
-      "validation_results": [],
-      "fix_history": [],
-      "latest_validation": {},
-      "uefn_import_path": "",
-      "imported_at": "",
-      "reference_images": [],
-      "tags": [],
-      "generation_provider": "free_ai",
-      "vertex_count": 48,
-      "face_count": 72,
-      "bounds_cm": {
-        "min": [
-          -40.0,
-          -120.0,
-          -25.0
-        ],
-        "max": [
-          40.0,
-          120.0,
-          72.5
-        ],
-        "size": [
-          80.0,
-          240.0,
-          97.5
-        ]
-      }
-    },
-    {
       "asset_id": "ddd83dd79584",
       "name": "wooden_crate_002",
       "category": "prop",
@@ -855,59 +720,62 @@
       }
     },
     {
-      "asset_id": "4ddb19d77248",
-      "name": "wooden_crate_005",
-      "category": "prop",
+      "asset_id": "e9d453e5d7aa",
+      "name": "luxury_mansion",
+      "category": "architecture",
       "project": "default",
-      "prompt": "create  a  crate",
+      "prompt": "create a mansion",
       "spec": {
-        "prompt": "create  a  crate",
-        "asset_name": "wooden_crate",
-        "category": "prop",
-        "purpose": "storage container",
+        "prompt": "create a mansion",
+        "asset_name": "luxury_mansion",
+        "category": "architecture",
+        "purpose": "main residence for a wealthy family",
         "required_components": [
-          "base",
-          "sides",
-          "top"
+          "main_building",
+          "garage",
+          "garden",
+          "pool",
+          "fountains"
         ],
-        "expected_silhouette": "rectangular box",
+        "expected_silhouette": "large, sprawling structure with multiple wings and towers",
         "scale_range_cm": {
-          "min_width": 40,
-          "max_width": 100,
-          "min_height": 30,
-          "max_height": 80,
-          "min_depth": 40,
-          "max_depth": 100
+          "min_width": 1500,
+          "max_width": 3000,
+          "min_height": 800,
+          "max_height": 1200,
+          "min_depth": 1000,
+          "max_depth": 2000
         },
-        "interior_required": false,
+        "interior_required": true,
         "failure_conditions": [
-          "no visible planks",
-          "no lid",
-          "irregular shape"
+          "too small",
+          "lacking ornate details",
+          "inconsistent architectural style"
         ],
-        "style": "rustic",
+        "style": "luxury",
         "color_palette": [
+          "#FFFFFF",
+          "#808080",
           "#964B00",
-          "#786C3B",
-          "#452B1F"
+          "#008000"
         ]
       },
       "version": 1,
       "status": "approved",
-      "created_at": "2026-03-26T06:24:41.477758+00:00",
-      "updated_at": "2026-03-26T06:24:43.430122+00:00",
-      "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\wooden_crate_005\\exports\\wooden_crate_005_v1.glb",
+      "created_at": "2026-03-26T06:32:02.184831+00:00",
+      "updated_at": "2026-03-26T06:32:10.090049+00:00",
+      "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\luxury_mansion\\exports\\luxury_mansion_v1.glb",
       "preview_screenshots": [
         "v1_placeholder.png"
       ],
-      "generated_code": "import trimesh\nimport numpy as np\n\n# Create a crate\nscene = trimesh.Scene()\n\n# Base\nbase = trimesh.creation.box(extents=[60, 60, 5])\nbase.visual.face_colors = [160, 110, 60, 255]\nscene.add_geometry(base, node_name=\"base\")\n\n# Sides\nside1 = trimesh.creation.box(extents=[5, 60, 50])\nside1.apply_translation([27.5, 0, 25])\nside1.visual.face_colors = [160, 110, 60, 255]\nscene.add_geometry(side1, node_name=\"side1\")\n\nside2 = trimesh.creation.box(extents=[5, 60, 50])\nside2.apply_translation([-32.5, 0, 25])\nside2.visual.face_colors = [160, 110, 60, 255]\nscene.add_geometry(side2, node_name=\"side2\")\n\nside3 = trimesh.creation.box(extents=[60, 5, 50])\nside3.apply_translation([0, 27.5, 25])\nside3.visual.face_colors = [160, 110, 60, 255]\nscene.add_geometry(side3, node_name=\"side3\")\n\nside4 = trimesh.creation.box(extents=[60, 5, 50])\nside4.apply_translation([0, -32.5, 25])\nside4.visual.face_colors = [160, 110, 60, 255]\nscene.add_geometry(side4, node_name=\"side4\")\n\n# Top\ntop = trimesh.creation.box(extents=[60, 60, 5])\ntop.apply_translation([0, 0, 55])\ntop.visual.face_colors = [150, 100, 50, 255]\nscene.add_geometry(top, node_name=\"top\")\n\n# Add some wooden planks texture\nplank1 = trimesh.creation.box(extents=[10, 60, 2])\nplank1.apply_translation([20, 0, 10])\nplank1.visual.face_colors = [150, 75, 0, 255]\nscene.add_geometry(plank1, node_name=\"plank1\")\n\nplank2 = trimesh.creation.box(extents=[10, 60, 2])\nplank2.apply_translation([-20, 0, 10])\nplank2.visual.face_colors = [150, 75, 0, 255]\nscene.add_geometry(plank2, node_name=\"plank2\")\n\nplank3 = trimesh.creation.box(extents=[60, 10, 2])\nplank3.apply_translation([0, 20, 10])\nplank3.visual.face_colors = [150, 75, 0, 255]\nscene.add_geometry(plank3, node_name=\"plank3\")\n\nplank4 = trimesh.creation.box(extents=[60, 10, 2])\nplank4.apply_translation([0, -20, 10])\nplank4.visual.face_colors = [150, 75, 0, 255]\nscene.add_geometry(plank4, node_name=\"plank4\")",
+      "generated_code": "import trimesh\nimport numpy as np\n\n# Create the scene\nscene = trimesh.Scene()\n\n# Main building (hollow box)\nouter_main = trimesh.creation.box(extents=[2000, 1500, 800])\nouter_main.apply_translation([0, 0, 400])\ninner_main = trimesh.creation.box(extents=[1800, 1300, 700])\ninner_main.apply_translation([0, 0, 350])\ntry:\n    main_building = trimesh.boolean.difference([outer_main, inner_main], engine=\"manifold\")\nexcept Exception:\n    main_building = outer_main  # fallback if boolean fails\nmain_building.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(main_building, node_name=\"main_building\")\n\n# Garage (hollow box)\nouter_garage = trimesh.creation.box(extents=[500, 300, 400])\nouter_garage.apply_translation([-700, -200, 200])\ninner_garage = trimesh.creation.box(extents=[450, 250, 350])\ninner_garage.apply_translation([-700, -200, 150])\ntry:\n    garage = trimesh.boolean.difference([outer_garage, inner_garage], engine=\"manifold\")\nexcept Exception:\n    garage = outer_garage  # fallback if boolean fails\ngarage.visual.face_colors = [128, 128, 128, 255]  # Gray\nscene.add_geometry(garage, node_name=\"garage\")\n\n# Garden (flat rectangle)\ngarden = trimesh.creation.box(extents=[1000, 500, 10])\ngarden.apply_translation([0, 500, 0])\ngarden.visual.face_colors = [0, 128, 0, 255]  # Green\nscene.add_geometry(garden, node_name=\"garden\")\n\n# Pool (flat rectangle)\npool = trimesh.creation.box(extents=[400, 200, 10])\npool.apply_translation([300, 200, 0])\npool.visual.face_colors = [0, 0, 255, 128]  # Blue\nscene.add_geometry(pool, node_name=\"pool\")\n\n# Fountains (small cylinders)\nfountain1 = trimesh.creation.cylinder(radius=20, height=50, sections=32)\nfountain1.apply_translation([0, 0, 25])\nfountain1.visual.face_colors = [139, 69, 19, 255]  # Brown\nscene.add_geometry(fountain1, node_name=\"fountain1\")\n\nfountain2 = trimesh.creation.cylinder(radius=20, height=50, sections=32)\nfountain2.apply_translation([500, 0, 25])\nfountain2.visual.face_colors = [139, 69, 19, 255]  # Brown\nscene.add_geometry(fountain2, node_name=\"fountain2\")\n\n# Towers (small cylinders)\ntower1 = trimesh.creation.cylinder(radius=50, height=200, sections=32)\ntower1.apply_translation([-500, 0, 100])\ntower1.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(tower1, node_name=\"tower1\")\n\ntower2 = trimesh.creation.cylinder(radius=50, height=200, sections=32)\ntower2.apply_translation([500, 0, 100])\ntower2.visual.face_colors = [255, 255, 255, 255]  # White\nscene.add_geometry(tower2, node_name=\"tower2\")",
       "validation_results": [
         {
           "passed": true,
           "overall_score": 0.5,
           "checks": [],
           "issues": [
-            "Validation error: ValidationCheck.__init__() got an unexpected keyword argument 'description'"
+            "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
           ],
           "recommendations": []
         }
@@ -918,7 +786,7 @@
         "overall_score": 0.5,
         "checks": [],
         "issues": [
-          "Validation error: ValidationCheck.__init__() got an unexpected keyword argument 'description'"
+          "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
         ],
         "recommendations": []
       },
@@ -927,23 +795,117 @@
       "reference_images": [],
       "tags": [],
       "generation_provider": "free_ai",
-      "vertex_count": 80,
-      "face_count": 120,
+      "vertex_count": 296,
+      "face_count": 560,
       "bounds_cm": {
         "min": [
-          -35.0,
-          -35.0,
-          -2.5
+          -1000.0,
+          -750.0,
+          -5.0
         ],
         "max": [
-          30.0,
-          30.0,
-          57.5
+          1000.0,
+          750.0,
+          800.0
         ],
         "size": [
-          65.0,
-          65.0,
-          60.0
+          2000.0,
+          1500.0,
+          805.0
+        ]
+      }
+    },
+    {
+      "asset_id": "af2a976bdfe8",
+      "name": "red_car",
+      "category": "vehicle",
+      "project": "default",
+      "prompt": "generate a red carr",
+      "spec": {
+        "prompt": "generate a red carr",
+        "asset_name": "red_car",
+        "category": "vehicle",
+        "purpose": "drivable vehicle for game environment",
+        "required_components": [
+          "body",
+          "wheels",
+          "windows",
+          "doors"
+        ],
+        "expected_silhouette": "compact sedan shape",
+        "scale_range_cm": {
+          "min_width": 350,
+          "max_width": 450,
+          "min_height": 100,
+          "max_height": 150,
+          "min_depth": 450,
+          "max_depth": 550
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "missing wheels",
+          "incorrect scale",
+          "non-vehicle shape"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FF0000",
+          "#FFFFFF",
+          "#000000"
+        ]
+      },
+      "version": 1,
+      "status": "approved",
+      "created_at": "2026-03-26T17:54:44.358989+00:00",
+      "updated_at": "2026-03-26T17:54:50.502943+00:00",
+      "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\red_car\\exports\\red_car_v1.glb",
+      "preview_screenshots": [
+        "v1_placeholder.png"
+      ],
+      "generated_code": "import trimesh\nimport numpy as np\nfrom trimesh.transformations import translation_matrix, rotation_matrix\n\n# Body\nbody = trimesh.creation.box(extents=[400, 500, 120])\nbody.apply_scale([1, 1, 0.8])  # adjust proportions\nbody.apply_translation([0, 0, -60])  # lower body\nbody.visual.face_colors = [255, 0, 0, 255]  # red\n\n# Hollow interior\ninterior = trimesh.creation.box(extents=[360, 460, 80])\ninterior.apply_translation([0, 0, -60])  # align with body\ninterior.apply_scale([1, 1, 0.8])  # adjust proportions\ntry:\n    body = trimesh.boolean.difference([body, interior], engine=\"manifold\")\nexcept Exception:\n    pass  # fallback if boolean operation fails\n\n# Wheels\nwheel = trimesh.creation.cylinder(radius=40, height=80, sections=32)\nwheel.apply_scale([1, 1, 0.5])  # adjust thickness\nwheel.apply_translation([170, 220, -120])  # front left\nwheel.visual.face_colors = [0, 0, 0, 255]  # black\nwheel2 = wheel.copy()\nwheel2.apply_translation([-170, 220, 0])  # front right\nwheel3 = wheel.copy()\nwheel3.apply_translation([170, -220, 0])  # rear left\nwheel4 = wheel.copy()\nwheel4.apply_translation([-170, -220, 0])  # rear right\n\n# Windows\nwindow = trimesh.creation.box(extents=[100, 50, 20])\nwindow.apply_translation([0, 150, 20])  # front\nwindow.visual.face_colors = [255, 255, 255, 128]  # white transparent\nwindow2 = window.copy()\nwindow2.apply_translation([0, -150, 0])  # rear\n\n# Doors\ndoor = trimesh.creation.box(extents=[80, 20, 100])\ndoor.apply_translation([150, 0, 0])  # front\ndoor.visual.face_colors = [255, 0, 0, 255]  # red\ndoor2 = door.copy()\ndoor2.apply_translation([-150, 0, 0])  # rear\n\n# Scene\nscene = trimesh.Scene()\nscene.add_geometry(body, node_name=\"body\")\nscene.add_geometry(wheel, node_name=\"wheel_front_left\")\nscene.add_geometry(wheel2, node_name=\"wheel_front_right\")\nscene.add_geometry(wheel3, node_name=\"wheel_rear_left\")\nscene.add_geometry(wheel4, node_name=\"wheel_rear_right\")\nscene.add_geometry(window, node_name=\"window_front\")\nscene.add_geometry(window2, node_name=\"window_rear\")\nscene.add_geometry(door, node_name=\"door_front\")\nscene.add_geometry(door2, node_name=\"door_rear\")",
+      "validation_results": [
+        {
+          "passed": true,
+          "overall_score": 0.5,
+          "checks": [],
+          "issues": [
+            "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+          ],
+          "recommendations": []
+        }
+      ],
+      "fix_history": [],
+      "latest_validation": {
+        "passed": true,
+        "overall_score": 0.5,
+        "checks": [],
+        "issues": [
+          "Validation error: ValidationResult.__init__() got an unexpected keyword argument 'vision_provider'"
+        ],
+        "recommendations": []
+      },
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "free_ai",
+      "vertex_count": 304,
+      "face_count": 572,
+      "bounds_cm": {
+        "min": [
+          -200.0,
+          -250.0,
+          -140.0
+        ],
+        "max": [
+          380.0,
+          480.0,
+          50.0
+        ],
+        "size": [
+          580.0,
+          730.0,
+          190.0
         ]
       }
     }
