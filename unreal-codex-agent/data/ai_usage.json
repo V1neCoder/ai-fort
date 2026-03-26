@@ -1,15 +1,15 @@
 {
-  "date": "2026-03-25",
+  "date": "2026-03-26",
   "providers": {
     "groq": {
-      "requests": 7,
-      "tokens_in": 77,
-      "tokens_out": 49
-    },
-    "cerebras": {
       "requests": 0,
       "tokens_in": 0,
       "tokens_out": 0
+    },
+    "cerebras": {
+      "requests": 1,
+      "tokens_in": 27766,
+      "tokens_out": 78
     },
     "gemini": {
       "requests": 0,

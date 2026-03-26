@@ -10,30 +10,48 @@ const WORKSPACE_ROOT = path.resolve(__dirname, '..', '..');
 const PRELOAD_PATH = path.join(__dirname, 'preload.js');
 const BACKEND_ENTRY = path.join(WORKSPACE_ROOT, 'app', 'backend', 'server.py');
 const BACKEND_HOST = '127.0.0.1';
-const BACKEND_PORT_START = 8010;
+const BACKEND_PORT_START = 8000;
 const BACKEND_PORT_END = 8035;
 
 let mainWindow = null;
 let backendProcess = null;
 let backendUrl = '';
 let backendPromise = null;
+let lastBackendFailure = '';
+const backendLogTail = [];
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function resolvePythonLaunch() {
+function pushBackendLog(prefix, chunk) {
+    const text = String(chunk || '').trim();
+    if (!text) {
+        return;
+    }
+    backendLogTail.push(`[${prefix}] ${text}`);
+    if (backendLogTail.length > 30) {
+        backendLogTail.splice(0, backendLogTail.length - 30);
+    }
+}
+
+function resolvePythonLaunchers() {
+    const launchers = [];
     const bundledVenv = path.join(WORKSPACE_ROOT, '.venv', 'Scripts', 'python.exe');
     if (fs.existsSync(bundledVenv)) {
-        return { command: bundledVenv, args: [BACKEND_ENTRY] };
+        launchers.push({ command: bundledVenv, args: [BACKEND_ENTRY], label: bundledVenv });
     }
 
     const explicitPython = process.env.PYTHON;
     if (explicitPython && fs.existsSync(explicitPython)) {
-        return { command: explicitPython, args: [BACKEND_ENTRY] };
+        launchers.push({ command: explicitPython, args: [BACKEND_ENTRY], label: explicitPython });
     }
 
-    return { command: 'python', args: [BACKEND_ENTRY] };
+    launchers.push({ command: 'python', args: [BACKEND_ENTRY], label: 'python' });
+    if (process.platform === 'win32') {
+        launchers.push({ command: 'py', args: ['-3', BACKEND_ENTRY], label: 'py -3' });
+    }
+    return launchers;
 }
 
 function requestJson(url) {
@@ -128,7 +146,8 @@ async function waitForBackendReady(port, child) {
 
     for (let attempt = 0; attempt < 80; attempt += 1) {
         if (child && child.exitCode !== null) {
-            throw new Error(`Backend exited before becoming ready (code ${child.exitCode})`);
+            const details = lastBackendFailure || backendLogTail.join('\n');
+            throw new Error(`Backend exited before becoming ready (code ${child.exitCode})${details ? `\n${details}` : ''}`);
         }
 
         const health = await probeBackend(port);
@@ -139,7 +158,8 @@ async function waitForBackendReady(port, child) {
         await delay(500);
     }
 
-    throw new Error(`Backend did not become ready on ${url}`);
+    const details = lastBackendFailure || backendLogTail.join('\n');
+    throw new Error(`Backend did not become ready on ${url}${details ? `\n${details}` : ''}`);
 }
 
 function stopBackendProcess() {
@@ -184,51 +204,73 @@ async function ensureBackend() {
             return backendUrl;
         }
 
-        const python = resolvePythonLaunch();
-        const child = spawn(python.command, python.args, {
-            cwd: WORKSPACE_ROOT,
-            env: {
-                ...process.env,
-                BACKEND_HOST,
-                BACKEND_PORT: String(port),
-                PYTHONUNBUFFERED: '1',
-            },
-            windowsHide: true,
-            stdio: ['ignore', 'pipe', 'pipe'],
-        });
+        const launchers = resolvePythonLaunchers();
+        let lastError = null;
 
-        backendProcess = child;
+        for (const python of launchers) {
+            backendLogTail.length = 0;
+            lastBackendFailure = '';
+            const child = spawn(python.command, python.args, {
+                cwd: WORKSPACE_ROOT,
+                env: {
+                    ...process.env,
+                    BACKEND_HOST,
+                    BACKEND_PORT: String(port),
+                    PYTHONUNBUFFERED: '1',
+                },
+                windowsHide: true,
+                stdio: ['ignore', 'pipe', 'pipe'],
+            });
 
-        child.stdout?.on('data', chunk => {
-            const text = String(chunk).trim();
-            if (text) {
-                console.log(`[backend:${port}] ${text}`);
+            backendProcess = child;
+
+            child.stdout?.on('data', chunk => {
+                pushBackendLog(`backend:${port}:stdout`, chunk);
+                const text = String(chunk).trim();
+                if (text) {
+                    console.log(`[backend:${port}] ${text}`);
+                }
+            });
+
+            child.stderr?.on('data', chunk => {
+                pushBackendLog(`backend:${port}:stderr`, chunk);
+                const text = String(chunk).trim();
+                if (text) {
+                    console.error(`[backend:${port}] ${text}`);
+                    lastBackendFailure = text;
+                }
+            });
+
+            child.on('exit', (code, signal) => {
+                console.log(`[electron] Backend exited (code=${code}, signal=${signal || 'none'})`);
+                if (backendProcess && child.pid === backendProcess.pid) {
+                    backendProcess = null;
+                    backendUrl = '';
+                    backendPromise = null;
+                }
+            });
+
+            child.on('error', error => {
+                const detail = `[spawn] ${python.label}: ${error.message || error}`;
+                pushBackendLog(`backend:${port}:spawn`, detail);
+                lastBackendFailure = detail;
+                console.error('[electron] Backend spawn failed:', error);
+            });
+
+            try {
+                backendUrl = await waitForBackendReady(port, child);
+                console.log(`[electron] Backend ready at ${backendUrl}`);
+                return backendUrl;
+            } catch (error) {
+                lastError = error;
+                const failedChild = backendProcess;
+                if (failedChild && failedChild.pid === child.pid) {
+                    stopBackendProcess();
+                }
             }
-        });
+        }
 
-        child.stderr?.on('data', chunk => {
-            const text = String(chunk).trim();
-            if (text) {
-                console.error(`[backend:${port}] ${text}`);
-            }
-        });
-
-        child.on('exit', (code, signal) => {
-            console.log(`[electron] Backend exited (code=${code}, signal=${signal || 'none'})`);
-            if (backendProcess && child.pid === backendProcess.pid) {
-                backendProcess = null;
-                backendUrl = '';
-                backendPromise = null;
-            }
-        });
-
-        child.on('error', error => {
-            console.error('[electron] Backend spawn failed:', error);
-        });
-
-        backendUrl = await waitForBackendReady(port, child);
-        console.log(`[electron] Backend ready at ${backendUrl}`);
-        return backendUrl;
+        throw lastError || new Error('Backend could not be launched by any configured Python launcher.');
     })();
 
     try {

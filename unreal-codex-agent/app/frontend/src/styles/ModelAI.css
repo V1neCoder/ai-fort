@@ -1,0 +1,87 @@
+.mai-container { display: flex; flex-direction: column; height: 100%; }
+
+/* Loading / Empty */
+.mai-loading { display: flex; align-items: center; justify-content: center; height: 100%; gap: 10px; color: #888; }
+.mai-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #555; gap: 12px; text-align: center; }
+.mai-empty h3 { margin: 0; color: #ccc; font-size: 20px; }
+.mai-goto-btn { padding: 8px 20px; background: #7c5cbf; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 8px; }
+.mai-goto-btn:hover { background: #6a4aad; }
+
+/* Top Bar */
+.mai-topbar { display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: #1a1a2e; border-bottom: 1px solid #2a2a4a; }
+.mai-back { display: flex; align-items: center; gap: 4px; background: none; border: 1px solid #3a3a5a; color: #ccc; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.mai-back:hover { background: #2a2a45; }
+.mai-topbar h2 { margin: 0; font-size: 16px; color: #e0e0e0; flex: 1; }
+.mai-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; color: white; }
+
+/* Split Layout */
+.mai-split { display: flex; flex: 1; overflow: hidden; }
+
+/* Viewer Pane */
+.mai-viewer-pane { flex: 1; background: #0f0f1a; display: flex; flex-direction: column; min-height: 400px; }
+.mai-canvas-wrap { flex: 1; position: relative; }
+.mai-no-model { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #444; gap: 8px; }
+
+/* Toolbar */
+.mai-toolbar { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #12122a; border-bottom: 1px solid #2a2a4a; flex-wrap: wrap; }
+.mai-toolbar-group { display: flex; align-items: center; gap: 3px; }
+.mai-toolbar-label { font-size: 11px; color: #666; margin-right: 4px; }
+.mai-toolbar-btn { display: flex; align-items: center; gap: 3px; padding: 4px 8px; background: #1a1a30; border: 1px solid #2a2a4a; border-radius: 4px; color: #999; font-size: 11px; cursor: pointer; }
+.mai-toolbar-btn:hover { background: #2a2a45; color: #ccc; }
+.mai-toolbar-btn.active { background: #2a2a50; border-color: #7c5cbf; color: #b49aed; }
+.mai-toolbar-btn.small { padding: 4px 6px; font-size: 10px; font-weight: 600; }
+
+/* Mesh Stats Panel */
+.mai-mesh-stats-panel { display: flex; gap: 16px; padding: 8px 12px; background: #12122a; border-top: 1px solid #2a2a4a; }
+.mai-stat { display: flex; flex-direction: column; align-items: center; }
+.mai-stat-val { font-size: 13px; font-weight: 600; color: #ccc; }
+.mai-stat-label { font-size: 10px; color: #666; }
+
+/* Category badge */
+.mai-cat-badge { font-size: 11px; background: #2a2a40; color: #999; padding: 2px 8px; border-radius: 4px; }
+
+/* Right Panel */
+.mai-panel { width: 340px; min-width: 280px; display: flex; flex-direction: column; border-left: 1px solid #2a2a4a; background: #14142e; }
+
+/* Tabs */
+.mai-tabs { display: flex; border-bottom: 1px solid #2a2a4a; }
+.mai-tab { flex: 1; padding: 10px; background: none; border: none; color: #888; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; }
+.mai-tab.active { color: #ccc; border-bottom-color: #7c5cbf; }
+.mai-tab:hover { color: #bbb; }
+.mai-tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* Edit Panel */
+.mai-hint { font-size: 12px; color: #777; margin: 0 0 12px; }
+.mai-edit-input { width: 100%; background: #1a1a30; border: 1px solid #3a3a5a; border-radius: 6px; color: #e0e0e0; padding: 10px; font-size: 13px; resize: vertical; outline: none; box-sizing: border-box; }
+.mai-edit-input:focus { border-color: #7c5cbf; }
+.mai-apply-btn { width: 100%; margin-top: 8px; padding: 8px; background: #7c5cbf; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.mai-apply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.mai-coming-soon { font-size: 11px; color: #555; text-align: center; margin-top: 12px; font-style: italic; }
+.mai-edit-error { margin-top: 8px; padding: 8px; background: rgba(217,83,79,0.15); border: 1px solid rgba(217,83,79,0.3); border-radius: 4px; color: #e8786e; font-size: 12px; }
+.mai-prompt-label { font-size: 12px; color: #888; margin: 0 0 8px; }
+.mai-prompt-label em { color: #bbb; }
+
+/* References */
+.mai-dropzone { border: 2px dashed #3a3a5a; border-radius: 8px; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #555; cursor: pointer; }
+.mai-dropzone:hover { border-color: #7c5cbf; color: #888; }
+
+/* Validation */
+.mai-score { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.mai-score-bar { flex: 1; height: 8px; background: #2a2a4a; border-radius: 4px; overflow: hidden; }
+.mai-score-fill { height: 100%; border-radius: 4px; }
+.mai-score span { font-size: 14px; font-weight: 600; color: #ccc; }
+.mai-issue { font-size: 12px; color: #e8786e; padding: 4px 0; border-bottom: 1px solid #1e1e3a; }
+.mai-rec { font-size: 12px; color: #5fa8d3; padding: 4px 0; }
+.mai-val-panel .mai-hint { margin-bottom: 0; }
+.mai-val-actions { display: flex; gap: 8px; margin-top: 16px; }
+.mai-approve-btn { padding: 8px 16px; background: #5cb85c; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.mai-approve-btn:hover { background: #4cae4c; }
+.mai-import-btn { padding: 8px 16px; background: #337ab7; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.mai-import-btn:hover { background: #286090; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mai-split { flex-direction: column; }
+    .mai-viewer-pane { min-height: 300px; max-height: 400px; }
+    .mai-panel { width: 100%; min-width: 0; }
+}

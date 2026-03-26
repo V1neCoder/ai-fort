@@ -30,7 +30,8 @@ IMPORTANT RULES:
 
 
 def generate_code(spec: AssetSpec, attempt: int = 1,
-                  previous_code: str = "", error_context: str = "") -> str:
+                  previous_code: str = "", error_context: str = "",
+                  placement_context: str = "", reference_context: str = "") -> str:
     """Generate trimesh Python code for the given asset spec.
 
     Args:
@@ -38,6 +39,8 @@ def generate_code(spec: AssetSpec, attempt: int = 1,
         attempt: Current attempt number (1-based).
         previous_code: Code from previous attempt (for corrections).
         error_context: Error or validation feedback from previous attempt.
+        placement_context: Scene context from MCP (where the model will be placed).
+        reference_context: Analysis of reference images.
 
     Returns:
         Python source code string that builds a trimesh.Scene.
@@ -87,6 +90,14 @@ def generate_code(spec: AssetSpec, attempt: int = 1,
         parts.append(f"\nPrevious code:\n```python\n{previous_code}\n```")
         parts.append("\nFix the issues above and generate improved code. "
                       "Make sure the asset is more detailed and correct.")
+
+    # Add placement context (scene awareness)
+    if placement_context:
+        parts.append(f"\n{placement_context}")
+
+    # Add reference image analysis
+    if reference_context:
+        parts.append(f"\n{reference_context}")
 
     user_msg = "\n".join(parts)
 

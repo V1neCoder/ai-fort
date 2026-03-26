@@ -136,6 +136,10 @@ class AssetRecord:
     uefn_import_path: str = ""
     imported_at: str = ""
 
+    # References and tags
+    reference_images: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+
     # Generation metadata
     generation_provider: str = ""
     vertex_count: int = 0
@@ -165,6 +169,8 @@ class AssetRecord:
             "latest_validation": self.latest_validation,
             "uefn_import_path": self.uefn_import_path,
             "imported_at": self.imported_at,
+            "reference_images": self.reference_images,
+            "tags": self.tags,
             "generation_provider": self.generation_provider,
             "vertex_count": self.vertex_count,
             "face_count": self.face_count,
@@ -198,7 +204,7 @@ class AssetRecord:
             "type": self.category,
             "category": self.category,
             "description": self.prompt,
-            "tags": [self.category, "ai-generated", self.spec.style if self.spec else ""],
+            "tags": list(set([self.category, "ai-generated"] + (self.tags or []) + ([self.spec.style] if self.spec and self.spec.style else []))),
             "dimensions": self.bounds_cm,
             "trust_score": self.latest_validation.get("overall_score", 0.0),
             "composite_asset": False,

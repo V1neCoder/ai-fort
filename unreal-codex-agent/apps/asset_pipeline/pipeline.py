@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .models import AssetSpec, AssetRecord, ValidationResult, FixEntry
 from .storage import AssetStorage
@@ -29,7 +29,8 @@ class AssetPipeline:
         self.registry = AssetRegistry(self.storage)
 
     def generate(self, prompt: str, project: str = "default",
-                 max_attempts: int = 3, auto_approve: bool = False) -> dict[str, Any]:
+                 max_attempts: int = 3, auto_approve: bool = False,
+                 on_progress: Callable[[str, float], None] | None = None) -> dict[str, Any]:
         """Run the full generation pipeline.
 
         Args:
@@ -37,13 +38,19 @@ class AssetPipeline:
             project: Project namespace.
             max_attempts: Maximum correction attempts.
             auto_approve: If True, auto-approve passing assets.
+            on_progress: Optional callback(message, progress_fraction) for status updates.
 
         Returns:
             Dict with asset_id, status, record details, and any errors.
         """
+        def _progress(msg: str, pct: float) -> None:
+            if on_progress:
+                on_progress(msg, pct)
+
         result: dict[str, Any] = {"prompt": prompt, "project": project}
 
         # 1. Parse intent
+        _progress("Parsing intent...", 0.05)
         try:
             spec = parse_intent(prompt, project)
         except Exception as e:
@@ -61,6 +68,7 @@ class AssetPipeline:
         result["name"] = record.name
 
         # 3. Generation loop
+        _progress("Starting generation...", 0.10)
         previous_code = ""
         error_context = ""
 
@@ -68,6 +76,7 @@ class AssetPipeline:
             record = self.registry.update_status(record, "generating")
 
             # Generate code
+            _progress(f"AI generating code (attempt {attempt}/{max_attempts})...", 0.15 + (attempt - 1) * 0.1)
             try:
                 code = generate_code(spec, attempt, previous_code, error_context)
             except Exception as e:
@@ -91,6 +100,7 @@ class AssetPipeline:
                 continue
 
             # Build mesh
+            _progress(f"Building 3D mesh (attempt {attempt})...", 0.40 + (attempt - 1) * 0.05)
             export_dir = self.storage.exports_dir(project, record.name)
             try:
                 build_result = build_mesh(code, record.name, export_dir, record.version)
@@ -132,6 +142,7 @@ class AssetPipeline:
             )
 
             # Render previews
+            _progress("Rendering preview screenshots...", 0.60)
             preview_dir = self.storage.previews_dir(project, record.name)
             try:
                 screenshots = render_screenshots(build_result["glb_path"], preview_dir, record.version)
@@ -140,6 +151,7 @@ class AssetPipeline:
                 screenshots = []
 
             # Validate
+            _progress("Running AI validation...", 0.75)
             record = self.registry.update_status(record, "validating")
             try:
                 validation = validate_asset(
@@ -176,6 +188,7 @@ class AssetPipeline:
                 break
 
         # 4. Approval gate
+        _progress("Checking approval...", 0.90)
         if record.status == "approved":
             approval = {"approved": True, "reasons": [], "warnings": []}
         elif record.status == "needs_correction" and auto_approve:

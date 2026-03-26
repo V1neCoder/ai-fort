@@ -25,9 +25,11 @@ Use this as execution grounding for house and home requests.
 ## Generative variation rules
 
 - Do not generate the exact same house every time.
-- Vary width, depth, roof pitch, overhang, stair proportions, and overall character within sane residential ranges.
+- Vary width, depth, roof pitch, overhang, stair-side placement, balcony presence, entry treatment, window rhythm, and overall character within sane residential ranges.
 - Keep variation believable and structurally valid.
 - When the request is general, choose a coherent house style rather than a generic cube shell.
+- Treat mansion, villa, townhouse, apartment, cottage, cabin, and suburban house as different residential families with different proportions and facade language.
+- A mansion or villa should feel larger and more articulated than a starter house by default, with stronger entry composition, wider footprint, and richer frontage.
 
 ## Placement behavior
 
@@ -40,6 +42,7 @@ Use this as execution grounding for house and home requests.
 - Default houses should feel intentional, not placeholder-only.
 - Use coherent body and roof materials when material choices are available.
 - Keep house proportions human-scaled and traversal-friendly.
+- Avoid stacking new houses onto other existing builds. Prefer planner-backed relocation when the requested footprint would interfere with nearby structures.
 
 ## Tooling rule
 

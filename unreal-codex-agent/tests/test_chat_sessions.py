@@ -1548,6 +1548,85 @@ class ChatEndpointTests(unittest.TestCase):
         self.assertEqual(result["summary"], "built pavilion")
         fake_build_structure.assert_called_once()
 
+    def test_handle_tool_call_build_structure_routes_residential_requests_to_house_builder(self):
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built apartment"}) as fake_build_house:
+            result = server._handle_tool_call("build_structure_action", {
+                "request": "create me a 4 story apartment",
+                "structure": "apartment",
+                "size": "large",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built apartment")
+        forwarded = fake_build_house.call_args.args[0]
+        self.assertEqual(forwarded["style"], "apartment")
+        self.assertEqual(forwarded["story_count"], 4)
+
+    def test_handle_tool_call_build_structure_ignores_bad_scenic_structure_when_request_is_house(self):
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built house"}) as fake_build_house:
+            result = server._handle_tool_call("build_structure_action", {
+                "request": "create me a full house with windows and a door and a proper roof",
+                "structure": "fountain",
+                "position": {"x": 4200, "y": 4200, "z": 0},
+                "size": "medium",
+                "material": "stone",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built house")
+        forwarded = fake_build_house.call_args.args[0]
+        self.assertEqual(
+            forwarded["request"],
+            "create me a full house with windows and a door and a proper roof",
+        )
+        self.assertEqual(forwarded["story_count"], 2)
+
+    def test_handle_tool_call_build_structure_routes_mansion_requests_to_house_builder(self):
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built mansion"}) as fake_build_house:
+            result = server._handle_tool_call("build_structure_action", {
+                "request": "create me a four story mansion with balconies",
+                "structure": "tower",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built mansion")
+        forwarded = fake_build_house.call_args.args[0]
+        self.assertEqual(forwarded["style"], "mansion")
+        self.assertEqual(forwarded["story_count"], 4)
+
+    def test_execute_action_blocks_routes_legacy_build_structure_house_to_shared_house_builder(self):
+        reply = """
+```action
+{"action": "build_structure", "structure": "house", "position": {"x": 4200, "y": 5200, "z": 0}, "size": "medium"}
+```
+"""
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built via house planner"}) as fake_build_house:
+            results = server._execute_action_blocks(reply)
+
+        self.assertEqual(len(results), 1)
+        self.assertTrue(results[0]["success"])
+        self.assertEqual(results[0]["action"], "build_structure")
+        fake_build_house.assert_called_once()
+
+    def test_execute_structure_action_with_shared_planner_uses_active_message_when_action_structure_is_wrong(self):
+        with patch.object(server, "_get_active_tool_context", return_value={
+            "message": "create me a full house with windows and a door and a proper roof",
+        }), patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built via active context"}) as fake_build_house:
+            result = server._execute_structure_action_with_shared_planner({
+                "structure": "fountain",
+                "position": {"x": 4200, "y": 4200, "z": 0},
+                "size": "medium",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built via active context")
+        forwarded = fake_build_house.call_args.args[0]
+        self.assertEqual(
+            forwarded["request"],
+            "create me a full house with windows and a door and a proper roof",
+        )
+        self.assertEqual(forwarded["story_count"], 2)
+
     def test_generate_structure_spec_supports_expanded_families_and_modifiers(self):
         spec, variation = server._generate_structure_spec_from_request(
             {
@@ -1573,6 +1652,60 @@ class ChatEndpointTests(unittest.TestCase):
         self.assertGreater(spec.roof_pitch_deg, 15.0)
         self.assertEqual(variation["body_material"], "metal")
         self.assertEqual(variation["roof_material"], "metal")
+
+    def test_generate_house_spec_supports_multistory_apartment_requests(self):
+        spec, variation = server._generate_house_spec_from_request(
+            {
+                "request": "create me a 4 story apartment",
+                "style": "apartment",
+                "size": "large",
+            },
+            message="create me a 4 story apartment",
+            chat_id="chat-apartment",
+            support_context={
+                "center_x": 4200.0,
+                "center_y": 5200.0,
+                "support_z": 0.0,
+                "support_surface_kind": "support_surface",
+                "support_level": 0,
+                "support_actor_label": "GridPlane4",
+            },
+        )
+
+        self.assertEqual(spec.story_count, 4)
+        self.assertEqual(variation["style"], "apartment")
+        self.assertEqual(variation["story_count"], 4)
+        self.assertGreater(spec.inner_width_cm, 900.0)
+        self.assertEqual(spec.roof_style, "parapet")
+        self.assertGreaterEqual(spec.window_columns_per_wall, 3)
+        self.assertGreater(spec.entry_canopy_depth_cm, 0.0)
+
+    def test_generate_house_spec_supports_mansion_requests_with_richer_defaults(self):
+        spec, variation = server._generate_house_spec_from_request(
+            {
+                "request": "create me a four story mansion with balconies and lots of windows",
+                "size": "large",
+            },
+            message="create me a four story mansion with balconies and lots of windows",
+            chat_id="chat-mansion",
+            support_context={
+                "center_x": 4200.0,
+                "center_y": 5200.0,
+                "support_z": 0.0,
+                "support_surface_kind": "support_surface",
+                "support_level": 0,
+                "support_actor_label": "GridPlane4",
+            },
+        )
+
+        self.assertEqual(variation["style"], "mansion")
+        self.assertEqual(spec.story_count, 4)
+        self.assertGreater(spec.inner_width_cm, 1200.0)
+        self.assertGreater(spec.inner_depth_cm, 950.0)
+        self.assertGreater(spec.balcony_depth_cm, 0.0)
+        self.assertGreater(spec.corner_column_diameter_cm, 0.0)
+        self.assertGreater(spec.site_clearance_cm, 100.0)
+        self.assertEqual(spec.variation_seed, variation["seed"])
 
     def test_handle_tool_call_can_execute_terrain_action(self):
         with patch.object(server, "_execute_terrain_control", return_value={"success": True, "summary": "created terrain"}) as fake_terrain:

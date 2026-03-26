@@ -876,8 +876,8 @@ def test_house_builder_creates_two_story_shell_with_roof_and_stairs():
     assert "floor_upper_right" in by_slot
     assert "floor_upper_front" in by_slot
     assert "landing_upper" in by_slot
-    assert "story1_wall_back" in by_slot
-    assert "story2_wall_front" in by_slot
+    assert any(slot.startswith("story1_wall_back") for slot in by_slot)
+    assert any(slot.startswith("story2_wall_front") for slot in by_slot)
     assert "roof_left" in by_slot
     assert "roof_right" in by_slot
     assert "roof_ridge" in by_slot
@@ -891,8 +891,98 @@ def test_house_builder_creates_two_story_shell_with_roof_and_stairs():
     assert by_slot["landing_upper"]["location"][2] == 310.0
     assert by_slot["roof_left"]["rotation"][2] == 30.0
     assert by_slot["roof_right"]["rotation"][2] == -30.0
-    assert by_slot["story1_door_header"]["location"][2] > by_slot["story1_wall_front_left"]["location"][2]
+    assert any(segment["structural_role"] == "window_glass" for segment in segments)
+    assert any(segment["structure_piece_role"] == "canopy" for segment in segments)
     assert any(volume["name"] == "stairwell_opening" for volume in list(structure_plan.get("reserved_volumes") or []))
+
+
+def test_house_builder_supports_multistory_apartment_shell():
+    spec = HouseSpec(
+        zone_id="zone_apartment",
+        center_x=4200.0,
+        center_y=5200.0,
+        support_z=0.0,
+        variation_seed=12,
+        story_count=4,
+        inner_width_cm=1040.0,
+        inner_depth_cm=920.0,
+        story_height_cm=290.0,
+        floor_thickness_cm=20.0,
+        stair_step_count=10,
+        stair_step_rise_cm=31.0,
+        stair_step_run_cm=30.0,
+        roof_style="parapet",
+        residential_profile="apartment",
+        window_columns_per_wall=3,
+        entry_canopy_depth_cm=110.0,
+        balcony_depth_cm=100.0,
+        corner_column_diameter_cm=34.0,
+        label_prefix="UCA_Apartment",
+        support_actor_label="GridPlane4",
+        parent_support_actor="GridPlane4",
+    )
+    structure_plan = build_house_structure_plan(spec)
+    segments = list(structure_plan.get("segments") or [])
+    by_slot = {segment["managed_slot"]: segment for segment in segments}
+
+    assert structure_plan["story_count"] == 4
+    assert "floor_story2_left" in by_slot
+    assert "floor_story3_left" in by_slot
+    assert "floor_story4_left" in by_slot
+    assert "landing_story4" in by_slot
+    assert any(slot.startswith("story4_wall_back") for slot in by_slot)
+    assert "stair_story3_10" in by_slot
+    assert "roof_slab" in by_slot
+    assert "roof_parapet_front" in by_slot
+    assert "roof_parapet_right" in by_slot
+    assert any(slot == "story2_balcony_slab" for slot in by_slot)
+    assert any("balcony" in slot and "rail" in slot for slot in by_slot)
+    assert structure_plan["circulation_plan"]["stair_run"]["flight_count"] == 3
+    assert any(segment["structural_role"] == "window_glass" for segment in segments)
+    assert any(segment["structural_role"] == "corner_column" for segment in segments)
+    assert any(volume["name"] == "stairwell_opening" for volume in list(structure_plan.get("reserved_volumes") or []))
+
+
+def test_house_builder_uses_variation_seed_for_stair_side_and_mansion_features():
+    left_plan = build_house_structure_plan(
+        HouseSpec(
+            zone_id="zone_mansion_left",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            variation_seed=1,
+            story_count=4,
+            inner_width_cm=1280.0,
+            inner_depth_cm=980.0,
+            residential_profile="mansion",
+            balcony_depth_cm=135.0,
+            entry_canopy_depth_cm=150.0,
+            corner_column_diameter_cm=48.0,
+            roof_style="gable",
+        )
+    )
+    right_plan = build_house_structure_plan(
+        HouseSpec(
+            zone_id="zone_mansion_right",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            variation_seed=2,
+            story_count=4,
+            inner_width_cm=1280.0,
+            inner_depth_cm=980.0,
+            residential_profile="mansion",
+            balcony_depth_cm=135.0,
+            entry_canopy_depth_cm=150.0,
+            corner_column_diameter_cm=48.0,
+            roof_style="gable",
+        )
+    )
+
+    assert left_plan["circulation_plan"]["stair_run"]["side"] != right_plan["circulation_plan"]["stair_run"]["side"]
+    left_slots = {segment["managed_slot"] for segment in list(left_plan.get("segments") or [])}
+    assert "story1_portico_column_left" in left_slots
+    assert "story2_balcony_slab" in left_slots
 
 
 def test_house_structure_plan_reserves_upper_stair_opening_and_landing():
@@ -942,14 +1032,24 @@ def test_structure_validation_fails_when_upper_floor_blocks_stairwell():
             support_z=0.0,
         )
     )
+    stairwell = next(
+        item for item in list(structure_plan.get("reserved_volumes") or [])
+        if isinstance(item, dict) and item.get("name") == "stairwell_opening"
+    )
+    blocker_center_x = (stairwell["min"][0] + stairwell["max"][0]) / 2.0
+    blocker_center_y = (stairwell["min"][1] + stairwell["max"][1]) / 2.0
+    blocker_center_z = (stairwell["min"][2] + stairwell["max"][2]) / 2.0
+    blocker_scale_x = max(0.6, (stairwell["max"][0] - stairwell["min"][0]) / 100.0)
+    blocker_scale_y = max(0.6, (stairwell["max"][1] - stairwell["min"][1]) / 100.0)
+    blocker_scale_z = max(0.2, (stairwell["max"][2] - stairwell["min"][2]) / 100.0)
     segments = list(structure_plan.get("segments") or [])
     segments.append(
         {
             "managed_slot": "bad_blocker",
             "spawn_label": "BadBlocker",
-            "location": [-240.0, 80.0, 310.0],
+            "location": [blocker_center_x, blocker_center_y, blocker_center_z],
             "rotation": [0.0, 0.0, 0.0],
-            "scale": [1.4, 2.4, 0.2],
+            "scale": [blocker_scale_x, blocker_scale_y, blocker_scale_z],
             "structure_piece_role": "floor_slab",
             "allowed_reserved_volume_kinds": [],
         }
@@ -984,14 +1084,6 @@ def test_roof_envelope_validation_flags_drifted_roof_panel():
 
 
 def test_reserved_volume_conflicts_are_reported_for_functional_openings():
-    active_actor = make_actor(
-        label="BlockingFloor",
-        class_name="StaticMeshActor",
-        location=[-240.0, 80.0, 310.0],
-        extent=[70.0, 120.0, 10.0],
-        selected=False,
-        asset_path="/Engine/BasicShapes/Cube.Cube",
-    )
     structure_plan = build_house_structure_plan(
         HouseSpec(
             zone_id="zone_house",
@@ -999,6 +1091,26 @@ def test_reserved_volume_conflicts_are_reported_for_functional_openings():
             center_y=0.0,
             support_z=0.0,
         )
+    )
+    stairwell = next(
+        item for item in list(structure_plan.get("reserved_volumes") or [])
+        if isinstance(item, dict) and item.get("name") == "stairwell_opening"
+    )
+    active_actor = make_actor(
+        label="BlockingFloor",
+        class_name="StaticMeshActor",
+        location=[
+            (stairwell["min"][0] + stairwell["max"][0]) / 2.0,
+            (stairwell["min"][1] + stairwell["max"][1]) / 2.0,
+            (stairwell["min"][2] + stairwell["max"][2]) / 2.0,
+        ],
+        extent=[
+            max(25.0, (stairwell["max"][0] - stairwell["min"][0]) / 2.0),
+            max(25.0, (stairwell["max"][1] - stairwell["min"][1]) / 2.0),
+            max(10.0, (stairwell["max"][2] - stairwell["min"][2]) / 2.0),
+        ],
+        selected=False,
+        asset_path="/Engine/BasicShapes/Cube.Cube",
     )
 
     conflicts = detect_actor_conflicts(
@@ -1021,8 +1133,11 @@ def test_house_actions_include_mount_types_for_structural_segments():
     )
     action_by_slot = {action["managed_slot"]: action for action in actions}
     assert action_by_slot["floor_ground"]["placement_hint"]["mount_type"] == "floor"
-    assert action_by_slot["story1_wall_back"]["placement_hint"]["mount_type"] == "wall"
+    wall_action = next(action for action in actions if str(action["managed_slot"]).startswith("story1_wall_back"))
+    glass_action = next(action for action in actions if action["placement_hint"].get("material_role") == "glass")
+    assert wall_action["placement_hint"]["mount_type"] == "wall"
     assert action_by_slot["roof_left"]["placement_hint"]["mount_type"] == "roof"
+    assert glass_action["asset_path"] == "/Engine/BasicShapes/Cube.Cube"
 
 
 def test_structure_planner_relocates_generic_structure_when_requested_footprint_is_occupied(tmp_path: Path):

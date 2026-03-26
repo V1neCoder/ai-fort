@@ -3,7 +3,7 @@ import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import {
     Menu, X, Settings, Zap, Package, Code,
-    AlertCircle, CheckCircle, Download, WifiOff, MessageSquare, Wand2
+    AlertCircle, CheckCircle, Download, WifiOff, MessageSquare, Wand2, Box, Eye
 } from 'lucide-react';
 
 import './App.css';
@@ -14,6 +14,9 @@ import SettingsPanel from './components/SettingsPanel';
 import ChatPanel from './components/ChatPanel';
 import StatusBar from './components/StatusBar';
 import AssetPipeline from './components/AssetPipeline';
+import PipelineView from './components/Pipeline/PipelineView';
+import AssetsView from './components/Assets/AssetsView';
+import ModelAIView from './components/ModelAI/ModelAIView';
 
 // Create context for backend URL
 export const AppContext = createContext<{
@@ -192,13 +195,17 @@ function App() {
                                     <Package size={18} />
                                     Tools
                                 </Link>
-                                <Link to="/assets" className="nav-link">
-                                    <Download size={18} />
-                                    Assets
-                                </Link>
                                 <Link to="/pipeline" className="nav-link">
                                     <Wand2 size={18} />
                                     Pipeline
+                                </Link>
+                                <Link to="/assets" className="nav-link">
+                                    <Box size={18} />
+                                    Assets
+                                </Link>
+                                <Link to="/model-ai" className="nav-link">
+                                    <Eye size={18} />
+                                    Model AI
                                 </Link>
                                 <Link to="/codex" className="nav-link">
                                     <Code size={18} />
@@ -240,10 +247,14 @@ function App() {
                         <Routes>
                             <Route path="/" element={<ChatPanel backendUrl={state.backendUrl} />} />
                             <Route path="/tools" element={<ToolDashboard backendUrl={state.backendUrl} />} />
-                            <Route path="/assets" element={<AssetBrowser backendUrl={state.backendUrl} />} />
-                            <Route path="/pipeline" element={<AssetPipeline backendUrl={state.backendUrl} />} />
+                            <Route path="/pipeline" element={<PipelineView backendUrl={state.backendUrl} />} />
+                            <Route path="/assets" element={<AssetsView backendUrl={state.backendUrl} />} />
+                            <Route path="/model-ai" element={<ModelAIView backendUrl={state.backendUrl} />} />
                             <Route path="/codex" element={<CodexPanel backendUrl={state.backendUrl} />} />
                             <Route path="/settings" element={<SettingsPanel appInfo={state.appInfo} backendUrl={state.backendUrl} />} />
+                            {/* Legacy routes (kept as fallback) */}
+                            <Route path="/assets-legacy" element={<AssetBrowser backendUrl={state.backendUrl} />} />
+                            <Route path="/pipeline-legacy" element={<AssetPipeline backendUrl={state.backendUrl} />} />
                         </Routes>
                     </main>
 

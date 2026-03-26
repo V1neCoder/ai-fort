@@ -6591,7 +6591,7 @@ MATERIAL/TEXTURE ACTION — apply textures to actors:
 ```
 Materials: brick, wood, metal, concrete, stucco, stone, glass, water, lava, grass, terrain, moss, dirt, sand, rock, cliff, snow, mud, ground, road, sidewalk, farmfield, ocean_floor, desert_grass, sparkle, glitter
 
-HOUSE BUILD ACTION — use this for houses, homes, cabins, cottages, and townhouses:
+HOUSE BUILD ACTION — use this for houses, homes, cabins, cottages, villas, mansions, townhouses, apartments, and condos:
 ```action
 {"action": "build_house", "request": "build a cozy house here", "style": "cottage", "size": "medium"}
 ```
@@ -6600,8 +6600,9 @@ Rules for house requests:
 - Houses should feel complete by default: floors, walls, roof, door, and believable circulation.
 - Multi-story houses must include stairs, a stairwell opening, and a reachable landing.
 - Vary footprint, roof pitch, and character within sane residential ranges instead of cloning the same shell.
+- Apartments and condos should still route through `build_house`, with an explicit `story_count` when the request calls for multi-story residential.
 
-GENERATIVE BUILD ACTION — build pre-designed structures with auto-texturing:
+GENERATIVE BUILD ACTION — build non-residential or scenic structures with auto-texturing:
 ```action
 {"action": "build_structure", "structure": "fountain", "position": {"x": 5200, "y": 4200, "z": 0}, "size": "medium", "material": "stone"}
 ```
@@ -8025,7 +8026,7 @@ def _get_server_action_capabilities() -> List[Dict[str, str]]:
     return [
         {"id": "rebuild_gable_roof_action", "description": "Rebuild a clean gable roof from live actor bounds and replace broken roof pieces."},
         {"id": "apply_material_action", "description": "Apply a named material or texture preset to actors matched by label pattern."},
-        {"id": "build_house_action", "description": "Build a functional generative house with managed slots, structural rules, stairs, floors, windows-ready shell logic, and roof planning."},
+        {"id": "build_house_action", "description": "Build a functional generative residential building with managed slots, structural rules, stairs, floors, windows, roofs, balconies, and planner-backed variation. Use this for houses, cabins, cottages, villas, mansions, townhouses, apartments, and condos."},
         {"id": "build_structure_action", "description": "Build generative structures such as garages, sheds, workshops, barns, warehouses, greenhouses, studios, hangars, kiosks, pavilions, gazebos, pergolas, canopies, carports, market stalls, and other shared-planner structures."},
         {"id": "terrain_action", "description": "Create, modify, list, and delete terrain patches with layered materials, edge surfacing, and environment dressing."},
         {"id": "import_attached_models", "description": "Import attached FBX or ZIP bundles into UEFN, preserve source materials/textures, and place meshes along splines, terrain curves, or patterns."},
@@ -9288,7 +9289,7 @@ YOUR TOOLS (use these to take action):
 11. analyze_chat_attachments — Inspect uploaded files and screenshots already attached in the current chat
 12. rebuild_gable_roof_action — Rebuild a clean gable roof from live actor bounds
 13. apply_material_action — Apply a named material to actor labels or groups
-14. build_house_action — Build a functional, generative house using the shared structure planner, managed slots, and house rules
+14. build_house_action — Build a functional, generative residential building using the shared structure planner, managed slots, and house rules. Use this for houses, cabins, cottages, villas, mansions, townhouses, apartments, and condos.
 15. build_structure_action — Build a generative garage, shed, workshop, barn, warehouse, greenhouse, studio, hangar, kiosk, pavilion, gazebo, pergola, canopy, carport, market stall, or scenic structure through shared geometry code
 16. terrain_action — Create or modify terrain with layered materials and environment dressing
 17. import_attached_models — Import attached FBX/ZIP models and place them along splines, terrain, or patterns
@@ -9714,7 +9715,7 @@ _CHAT_FUNCTIONS = [
         "type": "function",
         "function": {
             "name": "build_house_action",
-            "description": "Build a functional house using the shared structure planner. Prefer this for houses, homes, cabins, cottages, and similar requests instead of generic cube code.",
+            "description": "Build a functional residential building using the shared structure planner. Prefer this for houses, homes, cabins, cottages, villas, mansions, townhouses, apartments, condos, and similar requests instead of generic cube code.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -9728,11 +9729,15 @@ _CHAT_FUNCTIONS = [
                     },
                     "style": {
                         "type": "string",
-                        "description": "Optional style hint such as suburban, modern, cabin, cottage, or townhouse"
+                        "description": "Optional style hint such as suburban, modern, cabin, cottage, villa, mansion, townhouse, or apartment"
                     },
                     "size": {
                         "type": "string",
                         "description": "Approximate size label such as small, medium, large, or huge"
+                    },
+                    "story_count": {
+                        "type": "integer",
+                        "description": "Optional story count for multi-story residential builds such as a 4-story apartment"
                     },
                     "material": {
                         "type": "string",
@@ -10062,7 +10067,7 @@ def _handle_tool_call(name: str, arguments: dict) -> dict:
         return _execute_build_house(arguments)
 
     elif name == "build_structure_action":
-        return _execute_build_structure_request(arguments)
+        return _execute_structure_action_with_shared_planner(arguments)
 
     elif name == "terrain_action":
         return _execute_terrain_control(arguments)
@@ -10810,10 +10815,12 @@ def _execute_generative_build(action: dict) -> dict:
         return {"error": "UEFN not connected"}
 
     structure = str(action.get("structure", "")).strip().lower()
-    if structure in {"house", "home", "cabin", "cottage", "townhouse", "villa", "modern house", "suburban house"}:
+    if structure in {"house", "home", "cabin", "cottage", "townhouse", "villa", "mansion", "estate", "manor", "modern house", "suburban house", "apartment", "apartment building", "condo", "condominium"}:
         return _execute_build_house({
             "request": str(action.get("request") or structure),
-            "style": structure if structure not in {"house", "home"} else "",
+            "style": (_canonical_residential_style(structure) or structure) if structure not in {"house", "home"} else "",
+            "story_count": action.get("story_count")
+            or (_parse_requested_story_count(str(action.get("request") or structure), default=4) if structure in {"apartment", "apartment building", "condo", "condominium"} else (_parse_requested_story_count(str(action.get("request") or structure), default=3) if structure in {"mansion", "estate", "manor", "villa"} else None)),
             "position": action.get("position") or {},
             "size": action.get("size") or "medium",
             "material": action.get("material") or "",
@@ -10967,7 +10974,7 @@ def _execute_generative_build(action: dict) -> dict:
         ]
 
     else:
-        return {"error": f"Unknown structure: {structure}. Available: fountain, column, arch, tower, pool, fence, platform, bridge, waterfall"}
+        return {"error": f"Unknown structure: {structure}. Available scenic structures: fountain, column, arch, tower, pool, fence, platform, bridge, waterfall. Residential builds should use build_house/build_house_action, and planner-backed shared structures include garage, shed, workshop, barn, warehouse, greenhouse, studio, hangar, kiosk, pavilion, gazebo, pergola, canopy, carport, and market stall."}
 
     # Generate spawn code
     spawn_lines = []
@@ -11046,10 +11053,13 @@ def _house_style_from_request(message: str, explicit_style: str = "") -> str:
         return preferred
     lowered = str(message or "").lower()
     style_keywords = (
+        ("mansion", ("mansion", "estate", "manor", "grand house", "grand mansion", "luxury home")),
+        ("villa", ("villa", "mediterranean", "courtyard villa", "estate villa")),
         ("modern", ("modern", "sleek", "minimal", "contemporary")),
         ("cabin", ("cabin", "lodge", "rustic", "log house")),
         ("cottage", ("cottage", "cozy", "storybook", "country house")),
         ("townhouse", ("townhouse", "town home", "row house", "rowhome")),
+        ("apartment", ("apartment", "apartment building", "condo", "condominium", "residential block", "low rise")),
         ("suburban", ("suburban", "family house", "starter home", "residential")),
     )
     for style_name, keywords in style_keywords:
@@ -11067,6 +11077,119 @@ def _size_multiplier_from_label(size_label: str) -> float:
         "large": 1.15,
         "huge": 1.3,
     }.get(normalized, 1.0)
+
+
+def _apply_house_request_modifiers(
+    message: str,
+    *,
+    width_cm: float,
+    depth_cm: float,
+    story_height_cm: float,
+    roof_pitch_deg: float,
+    roof_rise_cm: float,
+    balcony_depth_cm: float,
+    entry_canopy_depth_cm: float,
+    corner_column_diameter_cm: float,
+    window_columns_per_wall: int,
+    site_clearance_cm: float,
+    style: str,
+) -> dict[str, Any]:
+    lowered = str(message or "").lower()
+    width_scale = 1.0
+    depth_scale = 1.0
+    story_height_scale = 1.0
+    roof_pitch_scale = 1.0
+    roof_rise_scale = 1.0
+    balcony_depth = float(balcony_depth_cm)
+    canopy_depth = float(entry_canopy_depth_cm)
+    corner_columns = float(corner_column_diameter_cm)
+    window_columns = int(window_columns_per_wall)
+    site_clearance = float(site_clearance_cm)
+
+    if style in {"mansion", "villa"}:
+        width_scale *= 1.16
+        depth_scale *= 1.1
+        site_clearance = max(site_clearance, 120.0)
+    elif style == "apartment":
+        width_scale *= 1.08
+        depth_scale *= 1.08
+        site_clearance = max(site_clearance, 100.0)
+
+    if any(token in lowered for token in ("grand", "luxury", "estate", "expansive", "sprawling")):
+        width_scale *= 1.12
+        depth_scale *= 1.08
+        site_clearance = max(site_clearance, 130.0)
+    if any(token in lowered for token in ("compact", "small footprint", "tight lot")):
+        width_scale *= 0.88
+        depth_scale *= 0.9
+    if any(token in lowered for token in ("wide", "broad", "wider")):
+        width_scale *= 1.12
+    if any(token in lowered for token in ("deep", "long", "extended")):
+        depth_scale *= 1.12
+    if any(token in lowered for token in ("tall ceiling", "tall ceilings", "lofty", "grand foyer")):
+        story_height_scale *= 1.08
+    if any(token in lowered for token in ("steep roof", "pitched roof", "dramatic roof", "proper roof")):
+        roof_pitch_scale *= 1.08
+        roof_rise_scale *= 1.1
+    if any(token in lowered for token in ("flat roof", "roof deck", "parapet")):
+        roof_pitch_scale *= 0.82
+        roof_rise_scale *= 0.82
+    if any(token in lowered for token in ("balcony", "terrace", "veranda")):
+        balcony_depth = max(balcony_depth, 120.0 if style in {"mansion", "villa"} else 95.0)
+    if any(token in lowered for token in ("porch", "portico", "covered entry", "canopy")):
+        canopy_depth = max(canopy_depth, 110.0 if style in {"mansion", "villa"} else 85.0)
+    if any(token in lowered for token in ("arched", "curved", "column", "columns")):
+        corner_columns = max(corner_columns, 42.0 if style in {"mansion", "villa"} else 28.0)
+    if any(token in lowered for token in ("window", "windows", "windowed", "many windows", "lots of windows")):
+        window_columns += 1
+
+    return {
+        "width_cm": round(width_cm * width_scale, 3),
+        "depth_cm": round(depth_cm * depth_scale, 3),
+        "story_height_cm": round(story_height_cm * story_height_scale, 3),
+        "roof_pitch_deg": round(roof_pitch_deg * roof_pitch_scale, 3),
+        "roof_rise_cm": round(roof_rise_cm * roof_rise_scale, 3),
+        "balcony_depth_cm": round(balcony_depth, 3),
+        "entry_canopy_depth_cm": round(canopy_depth, 3),
+        "corner_column_diameter_cm": round(corner_columns, 3),
+        "window_columns_per_wall": max(1, min(5, window_columns)),
+        "site_clearance_cm": round(site_clearance, 3),
+    }
+
+
+_NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+}
+
+
+def _parse_requested_story_count(message: str, explicit_story_count: Any = None, default: int = 2) -> int:
+    try:
+        explicit_value = int(explicit_story_count)
+        return max(1, min(8, explicit_value))
+    except (TypeError, ValueError):
+        pass
+
+    lowered = str(message or "").strip().lower()
+    if not lowered:
+        return max(1, min(8, default))
+
+    digit_match = re.search(r"\b(\d+)\s*[- ]?\s*(?:story|stories|floor|floors|level|levels)\b", lowered)
+    if digit_match:
+        return max(1, min(8, int(digit_match.group(1))))
+
+    word_pattern = "|".join(sorted(_NUMBER_WORDS, key=len, reverse=True))
+    word_match = re.search(rf"\b({word_pattern})\s*[- ]?\s*(?:story|stories|floor|floors|level|levels)\b", lowered)
+    if word_match:
+        return max(1, min(8, int(_NUMBER_WORDS.get(word_match.group(1), default))))
+
+    return max(1, min(8, default))
 
 
 _DIRECT_BUILD_VERBS = ("build", "make", "create", "generate", "spawn", "place", "add", "construct")
@@ -11093,7 +11216,14 @@ _DIRECT_HOUSE_KEYWORDS = (
     "home",
     "cabin",
     "cottage",
+    "mansion",
+    "estate",
+    "manor",
     "townhouse",
+    "apartment building",
+    "apartment",
+    "condominium",
+    "condo",
     "villa",
     "suburban house",
     "modern house",
@@ -11124,6 +11254,24 @@ _DIRECT_STRUCTURE_KEYWORDS = {
     "stall": "market_stall",
 }
 _SHARED_GENERATIVE_STRUCTURE_TYPES = set(SUPPORTED_GENERATIVE_STRUCTURE_TYPES)
+_RESIDENTIAL_STRUCTURE_ALIASES = {
+    "house": "suburban",
+    "home": "suburban",
+    "suburban house": "suburban",
+    "modern house": "modern",
+    "cabin": "cabin",
+    "cottage": "cottage",
+    "mansion": "mansion",
+    "estate": "mansion",
+    "manor": "mansion",
+    "townhouse": "townhouse",
+    "villa": "villa",
+    "apartment": "apartment",
+    "apartment building": "apartment",
+    "condo": "apartment",
+    "condominium": "apartment",
+    "duplex": "townhouse",
+}
 _TOOL_FORCED_TERRAIN_KEYWORDS = (
     "terrain",
     "landscape",
@@ -11198,6 +11346,9 @@ def _build_tool_routing_guidance(message: str, attachments: list[dict[str, Any]]
     if direct_structure_request:
         if direct_structure_request.get("kind") == "house":
             lines.append("- Use `build_house_action` for this request instead of ad-hoc Python or generic prose.")
+            story_count = _parse_requested_story_count(message, default=2)
+            if story_count > 2:
+                lines.append(f"- This is multi-story residential. Set `story_count={story_count}` and keep stairs, landings, and the roof fully functional.")
         elif direct_structure_request.get("kind") == "structure":
             lines.append(
                 f"- Use `build_structure_action` for this request and set `structure=\"{direct_structure_request.get('structure_type')}\"` so shared geometry code handles the build."
@@ -11242,10 +11393,13 @@ def _infer_body_and_roof_materials(message: str, explicit_material: str = "", ex
     roof = _resolve_material_name(explicit_roof_material or "")
     if not body or body not in MATERIAL_CATALOG:
         defaults = {
+            "mansion": "stone",
+            "villa": "stucco",
             "modern": "concrete",
             "cabin": "wood",
             "cottage": "stucco",
             "townhouse": "brick",
+            "apartment": "concrete",
             "suburban": "stucco",
         }
         body = defaults.get(style or "suburban", "stucco")
@@ -11256,14 +11410,110 @@ def _infer_body_and_roof_materials(message: str, explicit_material: str = "", ex
                 break
     if not roof or roof not in MATERIAL_CATALOG:
         roof_defaults = {
+            "mansion": "stone",
+            "villa": "stucco",
             "modern": "metal",
             "cabin": "wood",
             "cottage": "wood",
             "townhouse": "metal",
+            "apartment": "metal",
             "suburban": "metal",
         }
         roof = roof_defaults.get(style or "suburban", "metal")
     return body, roof
+
+
+def _select_material_for_structure_role(
+    *,
+    material_role: str,
+    body_material_path: str | None,
+    roof_material_path: str | None,
+    trim_material_path: str | None,
+    floor_material_path: str | None,
+    glass_material_path: str | None,
+) -> str | None:
+    role = str(material_role or "body").strip().lower()
+    if role == "roof":
+        return roof_material_path or body_material_path
+    if role == "glass":
+        return glass_material_path or trim_material_path or body_material_path
+    if role == "trim":
+        return trim_material_path or body_material_path or roof_material_path
+    if role == "floor":
+        return floor_material_path or body_material_path
+    return body_material_path or trim_material_path or roof_material_path
+
+
+def _canonical_residential_style(value: Any) -> str:
+    normalized = str(value or "").strip().lower()
+    return _RESIDENTIAL_STRUCTURE_ALIASES.get(normalized, "")
+
+
+def _execute_structure_action_with_shared_planner(action: dict[str, Any]) -> dict[str, Any]:
+    context = _get_active_tool_context()
+    explicit_structure_value = str(
+        action.get("structure")
+        or action.get("structure_type")
+        or ""
+    ).strip()
+    request_text = str(
+        action.get("request")
+        or context.get("message")
+        or explicit_structure_value
+        or ""
+    ).strip()
+    direct_request = _detect_direct_structure_request(request_text)
+
+    if direct_request and direct_request.get("kind") == "house":
+        forwarded_action = dict(action)
+        forwarded_action["request"] = request_text
+        matched_keyword = str(direct_request.get("matched_keyword") or "").strip()
+        residential_style = (
+            _canonical_residential_style(matched_keyword)
+            or _canonical_residential_style(explicit_structure_value)
+        )
+        if residential_style and not str(forwarded_action.get("style") or "").strip():
+            forwarded_action["style"] = residential_style
+        if forwarded_action.get("story_count") in (None, ""):
+            story_default = 4 if residential_style == "apartment" else 2
+            forwarded_action["story_count"] = _parse_requested_story_count(
+                request_text,
+                default=story_default,
+            )
+        return _execute_build_house(forwarded_action)
+
+    if direct_request and direct_request.get("kind") == "structure":
+        canonical_requested_structure = canonical_structure_type(
+            str(direct_request.get("structure_type") or ""),
+            fallback="",
+        )
+        if canonical_requested_structure:
+            forwarded_action = dict(action)
+            forwarded_action["request"] = request_text
+            forwarded_action["structure"] = canonical_requested_structure
+            return _execute_build_structure_request(forwarded_action)
+
+    structure_value = explicit_structure_value or request_text
+    residential_style = _canonical_residential_style(structure_value)
+    if residential_style:
+        forwarded_action = dict(action)
+        forwarded_action["request"] = request_text
+        if residential_style != "suburban" and not str(forwarded_action.get("style") or "").strip():
+            forwarded_action["style"] = residential_style
+        if residential_style == "apartment" and forwarded_action.get("story_count") in (None, ""):
+            forwarded_action["story_count"] = _parse_requested_story_count(
+                request_text,
+                default=4,
+            )
+        return _execute_build_house(forwarded_action)
+
+    canonical_structure = canonical_structure_type(structure_value, fallback="")
+    if canonical_structure:
+        forwarded_action = dict(action)
+        forwarded_action["request"] = request_text
+        forwarded_action["structure"] = canonical_structure
+        return _execute_build_structure_request(forwarded_action)
+    return _execute_generative_build(action)
 
 
 def _support_anchor_for_actor_payload(actor: dict[str, Any]) -> list[float]:
@@ -11347,7 +11597,28 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
     style = _house_style_from_request(message, str(action.get("style") or ""))
     seed = _stable_house_seed(message, chat_id, explicit_seed=action.get("variation_seed"))
     rng = random.Random(seed)
+    requested_story_count = _parse_requested_story_count(
+        message,
+        explicit_story_count=action.get("story_count"),
+        default=4 if style == "apartment" else (3 if style in {"mansion", "villa"} else 2),
+    )
     style_ranges = {
+        "mansion": {
+            "width": (1100.0, 1520.0),
+            "depth": (900.0, 1320.0),
+            "story_height": (315.0, 350.0),
+            "roof_pitch": (28.0, 40.0),
+            "roof_overhang": (26.0, 40.0),
+            "roof_rise": (135.0, 200.0),
+        },
+        "villa": {
+            "width": (980.0, 1320.0),
+            "depth": (820.0, 1120.0),
+            "story_height": (305.0, 340.0),
+            "roof_pitch": (24.0, 34.0),
+            "roof_overhang": (24.0, 34.0),
+            "roof_rise": (120.0, 175.0),
+        },
         "modern": {
             "width": (820.0, 980.0),
             "depth": (620.0, 780.0),
@@ -11380,6 +11651,14 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
             "roof_overhang": (12.0, 22.0),
             "roof_rise": (95.0, 135.0),
         },
+        "apartment": {
+            "width": (900.0, 1240.0),
+            "depth": (760.0, 1080.0),
+            "story_height": (285.0, 310.0),
+            "roof_pitch": (18.0, 26.0),
+            "roof_overhang": (12.0, 18.0),
+            "roof_rise": (90.0, 125.0),
+        },
         "suburban": {
             "width": (760.0, 940.0),
             "depth": (620.0, 820.0),
@@ -11401,6 +11680,78 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
     stair_step_rise_cm = _safe_number(action.get("stair_step_rise_cm"), rng.uniform(18.0, 20.5))
     stair_step_run_cm = _safe_number(action.get("stair_step_run_cm"), rng.uniform(27.0, 31.0))
     stair_step_count = int(action.get("stair_step_count") or max(10, min(14, int(round((story_height_cm + 20.0) / max(stair_step_rise_cm, 1.0))))))
+    roof_style = str(action.get("roof_style") or ("parapet" if style in {"apartment", "townhouse", "modern"} and requested_story_count >= 4 else "gable"))
+    window_columns = int(
+        action.get("window_columns_per_wall")
+        or (
+            4 if style == "apartment" else
+            3 if style in {"mansion", "villa"} else
+            2
+        )
+    )
+    window_width_cm = _safe_number(
+        action.get("window_width_cm"),
+        rng.uniform(120.0, 150.0) if style == "apartment" else rng.uniform(110.0, 140.0),
+    )
+    window_height_cm = _safe_number(
+        action.get("window_height_cm"),
+        rng.uniform(115.0, 145.0) if style == "apartment" else rng.uniform(105.0, 130.0),
+    )
+    window_sill_height_cm = _safe_number(
+        action.get("window_sill_height_cm"),
+        rng.uniform(85.0, 100.0) if style == "apartment" else rng.uniform(90.0, 110.0),
+    )
+    entry_canopy_depth_cm = _safe_number(
+        action.get("entry_canopy_depth_cm"),
+        150.0 if style == "mansion" else
+        125.0 if style == "villa" else
+        110.0 if style == "apartment" else
+        (80.0 if style in {"townhouse", "modern"} else 45.0),
+    )
+    balcony_depth_cm = _safe_number(
+        action.get("balcony_depth_cm"),
+        135.0 if style == "mansion" else
+        120.0 if style == "villa" else
+        100.0 if style == "apartment" else
+        80.0 if style == "townhouse" else 0.0,
+    )
+    corner_column_diameter_cm = _safe_number(
+        action.get("corner_column_diameter_cm"),
+        48.0 if style == "mansion" else
+        42.0 if style == "villa" else
+        34.0 if style in {"apartment", "townhouse", "modern"} else 0.0,
+    )
+    site_clearance_cm = _safe_number(
+        action.get("site_clearance_cm"),
+        140.0 if style == "mansion" else
+        120.0 if style == "villa" else
+        100.0 if style == "apartment" else
+        80.0 if requested_story_count >= 3 else 60.0,
+    )
+    modifiers = _apply_house_request_modifiers(
+        message,
+        width_cm=width_cm,
+        depth_cm=depth_cm,
+        story_height_cm=story_height_cm,
+        roof_pitch_deg=roof_pitch_deg,
+        roof_rise_cm=roof_rise_cm,
+        balcony_depth_cm=balcony_depth_cm,
+        entry_canopy_depth_cm=entry_canopy_depth_cm,
+        corner_column_diameter_cm=corner_column_diameter_cm,
+        window_columns_per_wall=window_columns,
+        site_clearance_cm=site_clearance_cm,
+        style=style,
+    )
+    width_cm = modifiers["width_cm"]
+    depth_cm = modifiers["depth_cm"]
+    story_height_cm = modifiers["story_height_cm"]
+    roof_pitch_deg = modifiers["roof_pitch_deg"]
+    roof_rise_cm = modifiers["roof_rise_cm"]
+    balcony_depth_cm = modifiers["balcony_depth_cm"]
+    entry_canopy_depth_cm = modifiers["entry_canopy_depth_cm"]
+    corner_column_diameter_cm = modifiers["corner_column_diameter_cm"]
+    window_columns = int(modifiers["window_columns_per_wall"])
+    site_clearance_cm = modifiers["site_clearance_cm"]
     label_prefix = str(action.get("label_prefix") or f"UCA_{style.title()}House").strip()
     zone_id = str(action.get("zone_id") or f"zone_house_{_clean_identifier_fragment(style)}_{seed % 100000:05d}").strip()
     spec = HouseSpec(
@@ -11408,6 +11759,8 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
         center_x=float(support_context["center_x"]),
         center_y=float(support_context["center_y"]),
         support_z=float(support_context["support_z"]),
+        variation_seed=seed,
+        story_count=requested_story_count,
         inner_width_cm=width_cm,
         inner_depth_cm=depth_cm,
         story_height_cm=story_height_cm,
@@ -11415,10 +11768,19 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
         floor_thickness_cm=_safe_number(action.get("floor_thickness_cm"), 20.0),
         door_width_cm=_safe_number(action.get("door_width_cm"), max(150.0, min(width_cm - 140.0, 170.0))),
         door_height_cm=_safe_number(action.get("door_height_cm"), min(story_height_cm - 35.0, 230.0)),
+        roof_style=roof_style,
         roof_pitch_deg=roof_pitch_deg,
         roof_thickness_cm=_safe_number(action.get("roof_thickness_cm"), 18.0),
         roof_overhang_cm=roof_overhang_cm,
         roof_rise_cm=roof_rise_cm,
+        window_width_cm=window_width_cm,
+        window_height_cm=window_height_cm,
+        window_sill_height_cm=window_sill_height_cm,
+        window_columns_per_wall=window_columns,
+        entry_canopy_depth_cm=entry_canopy_depth_cm,
+        balcony_depth_cm=balcony_depth_cm,
+        corner_column_diameter_cm=corner_column_diameter_cm,
+        site_clearance_cm=site_clearance_cm,
         stair_width_cm=stair_width_cm,
         stair_step_rise_cm=stair_step_rise_cm,
         stair_step_run_cm=stair_step_run_cm,
@@ -11431,6 +11793,7 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
         gable_infill_step_count=int(action.get("gable_infill_step_count") or 4),
         grid_snap_cm=_safe_number(action.get("grid_snap_cm"), 10.0),
         label_prefix=label_prefix,
+        residential_profile=style,
         support_surface_kind=str(support_context["support_surface_kind"] or "support_surface"),
         support_level=int(support_context["support_level"] or 0),
         support_actor_label=str(support_context["support_actor_label"] or ""),
@@ -11446,8 +11809,11 @@ def _generate_house_spec_from_request(action: dict[str, Any], *, message: str, c
     return spec, {
         "seed": seed,
         "style": style,
+        "story_count": requested_story_count,
         "body_material": body_material,
         "roof_material": roof_material,
+        "trim_material": "concrete" if style in {"apartment", "modern"} else ("stone" if style in {"mansion", "villa"} else body_material),
+        "glass_material": "glass",
         "size_label": str(action.get("size") or "medium"),
     }
 
@@ -11960,6 +12326,9 @@ def _execute_build_house(action: dict) -> dict:
     live_actors_by_slot: dict[str, dict[str, Any]] = {}
     body_material_path = _get_material_path(variation["body_material"])
     roof_material_path = _get_material_path(variation["roof_material"])
+    trim_material_path = _get_material_path(variation.get("trim_material") or variation["body_material"])
+    floor_material_path = _get_material_path(f"{variation['body_material']}_floor") or body_material_path
+    glass_material_path = _get_material_path(variation.get("glass_material") or "glass")
 
     if action_backend == "uefn_mcp_apply":
         for action_payload in actions:
@@ -11976,8 +12345,16 @@ def _execute_build_house(action: dict) -> dict:
                 actor_payload["managed_slot"] = managed_slot
                 live_actors_by_slot[managed_slot] = actor_payload
             actor_path = str(actor_payload.get("actor_path") or "").strip()
-            structural_role = str((action_payload.get("placement_hint") or {}).get("structural_role") or "").strip().lower()
-            selected_material = roof_material_path if structural_role in {"roof_panel", "roof_ridge", "gable_infill"} else body_material_path
+            placement_hint = dict(action_payload.get("placement_hint") or {})
+            material_role = str(placement_hint.get("material_role") or "").strip().lower()
+            selected_material = _select_material_for_structure_role(
+                material_role=material_role,
+                body_material_path=body_material_path,
+                roof_material_path=roof_material_path,
+                trim_material_path=trim_material_path,
+                floor_material_path=floor_material_path,
+                glass_material_path=glass_material_path,
+            )
             if actor_path and selected_material:
                 material_results.append(
                     set_actor_material(
@@ -12044,8 +12421,9 @@ def _execute_build_house(action: dict) -> dict:
         encoding="utf-8",
     )
 
+    residential_label = "apartment building" if variation["style"] == "apartment" else "house"
     summary = (
-        f"Built a {variation['style']} house with the shared structure planner. "
+        f"Built a {variation['style']} {spec.story_count}-story {residential_label} with the shared structure planner. "
         f"Used {len(actions)} managed pieces, support={spec.support_surface_kind}, "
         f"relocated={bool(plan.get('relocated', False))}, validation={'passed' if structure_validation.get('passed') else 'needs review'}."
     )
@@ -12058,6 +12436,7 @@ def _execute_build_house(action: dict) -> dict:
             "zone_id": spec.zone_id,
             "session_id": session_path.name,
             "style": variation["style"],
+            "story_count": spec.story_count,
             "variation_seed": variation["seed"],
             "materials": {
                 "body": variation["body_material"],
@@ -12163,6 +12542,9 @@ def _execute_build_structure_request(action: dict) -> dict:
     live_actors_by_slot: dict[str, dict[str, Any]] = {}
     body_material_path = _get_material_path(variation["body_material"])
     roof_material_path = _get_material_path(variation["roof_material"])
+    trim_material_path = _get_material_path(variation.get("trim_material") or variation["body_material"])
+    floor_material_path = _get_material_path(f"{variation['body_material']}_floor") or body_material_path
+    glass_material_path = _get_material_path(variation.get("glass_material") or "glass")
 
     if action_backend == "uefn_mcp_apply":
         for action_payload in actions:
@@ -12179,8 +12561,16 @@ def _execute_build_structure_request(action: dict) -> dict:
                 actor_payload["managed_slot"] = managed_slot
                 live_actors_by_slot[managed_slot] = actor_payload
             actor_path = str(actor_payload.get("actor_path") or "").strip()
-            structural_role = str((action_payload.get("placement_hint") or {}).get("structural_role") or "").strip().lower()
-            selected_material = roof_material_path if structural_role in {"roof_panel", "roof_ridge", "gable_infill", "roof_slat"} else body_material_path
+            placement_hint = dict(action_payload.get("placement_hint") or {})
+            material_role = str(placement_hint.get("material_role") or "").strip().lower()
+            selected_material = _select_material_for_structure_role(
+                material_role=material_role,
+                body_material_path=body_material_path,
+                roof_material_path=roof_material_path,
+                trim_material_path=trim_material_path,
+                floor_material_path=floor_material_path,
+                glass_material_path=glass_material_path,
+            )
             if actor_path and selected_material:
                 material_results.append(
                     set_actor_material(
@@ -13772,8 +14162,8 @@ def _execute_action_blocks(reply: str) -> list:
                 results.append(r)
 
             elif action_type == "build_structure":
-                # Generative construction — build from description
-                r = _execute_generative_build(action)
+                # Backward-compatible structure routing through the shared planner
+                r = _execute_structure_action_with_shared_planner(action)
                 r["action"] = action_type
                 results.append(r)
 
@@ -14241,21 +14631,22 @@ To apply a material/texture to actors:
 Available materials: brick, wood, metal, concrete, stucco, stone, glass, water, lava, grass, terrain, moss, sparkle, glitter, wood_floor, brick_floor, metal_floor, default
 Aliases: rocks→stone, cement→concrete, shiny→sparkle, pool→water, etc.
 
-To build a functional house with the shared structure planner:
+To build a functional residential building with the shared structure planner:
 ```action
 {"action": "build_house", "request": "build a modern house here", "style": "modern", "size": "large"}
 ```
-Use this for house/home/cabin/cottage/townhouse requests.
+Use this for house/home/cabin/cottage/townhouse/apartment/condo requests.
 - Prefer this over `build_structure` for anything residential.
 - Houses must include coherent walls, floors, roof, door, and sane circulation.
 - If the build is multi-story, the stairs must arrive into a real landing and open floor area.
 - Vary the house within sane residential ranges instead of cloning the same shape every time.
+- For apartments and condos, include `story_count` when the request clearly calls for 3+ stories.
 
-To build a structure generatively (with auto-texturing):
+To build a non-residential or scenic structure generatively (with auto-texturing):
 ```action
 {"action": "build_structure", "structure": "fountain", "position": {"x": 5200, "y": 4200, "z": 0}, "size": "medium", "material": "stone"}
 ```
-Available structures: fountain, column, arch, tower, pool, fence, platform, bridge, waterfall
+Available structures: garage, shed, workshop, barn, warehouse, greenhouse, studio, hangar, kiosk, pavilion, gazebo, pergola, canopy, carport, market stall, fountain, column, arch, tower, pool, fence, platform, bridge, waterfall
 Sizes: small, medium, large, huge
 
 To create layered terrain with biome-aware decoration:
@@ -15352,12 +15743,12 @@ def quick_switch_model():
 # ============================================================================
 
 _pipeline_instance = None
+_job_manager_instance = None
 
 def _get_pipeline():
     global _pipeline_instance
     if _pipeline_instance is None:
-        import sys, importlib
-        # Ensure apps package is importable
+        import sys
         apps_root = str(WORKSPACE_ROOT / "apps")
         if apps_root not in sys.path:
             sys.path.insert(0, str(WORKSPACE_ROOT))
@@ -15366,9 +15757,20 @@ def _get_pipeline():
     return _pipeline_instance
 
 
+def _get_job_manager():
+    global _job_manager_instance
+    if _job_manager_instance is None:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.job_manager import JobManager
+        _job_manager_instance = JobManager()
+    return _job_manager_instance
+
+
 @app.route('/api/pipeline/generate', methods=['POST'])
 def pipeline_generate():
-    """Start asset generation from a text prompt."""
+    """Start async asset generation from a text prompt. Returns job_id immediately."""
     data = request.get_json(force=True)
     prompt = data.get("prompt", "").strip()
     if not prompt:
@@ -15378,11 +15780,48 @@ def pipeline_generate():
     auto_approve = data.get("auto_approve", False)
 
     try:
-        pipeline = _get_pipeline()
-        result = pipeline.generate(prompt, project=project, auto_approve=auto_approve)
-        return jsonify(result)
+        jm = _get_job_manager()
+        job_id = jm.create_job(prompt, project=project, auto_approve=auto_approve)
+        return jsonify({"job_id": job_id, "status": "queued"}), 202
     except Exception as e:
-        logger.exception("Pipeline generation failed")
+        logger.exception("Pipeline job creation failed")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/pipeline/jobs', methods=['GET'])
+def pipeline_list_jobs():
+    """List all pipeline jobs (active + recent)."""
+    try:
+        jm = _get_job_manager()
+        jobs = jm.list_jobs()
+        return jsonify({"jobs": jobs})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/pipeline/jobs/<job_id>', methods=['GET'])
+def pipeline_get_job(job_id):
+    """Get job status/progress/result."""
+    try:
+        jm = _get_job_manager()
+        job = jm.get_job(job_id)
+        if job is None:
+            return jsonify({"error": "Job not found"}), 404
+        return jsonify(job)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/pipeline/jobs/<job_id>/cancel', methods=['POST'])
+def pipeline_cancel_job(job_id):
+    """Cancel a running job."""
+    try:
+        jm = _get_job_manager()
+        cancelled = jm.cancel_job(job_id)
+        if not cancelled:
+            return jsonify({"error": "Job not found or already finished"}), 404
+        return jsonify({"success": True})
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
@@ -15463,6 +15902,230 @@ def serve_ai_asset(filepath):
     from flask import send_from_directory
     ai_assets_dir = DATA_DIR / "ai_assets"
     return send_from_directory(str(ai_assets_dir), filepath)
+
+
+# ============================================================================
+# MODEL AI ROUTES
+# ============================================================================
+
+@app.route('/api/model-ai/edit', methods=['POST'])
+def model_ai_edit():
+    """Start an async AI edit job for a model."""
+    try:
+        data = request.json or {}
+        asset_id = data.get("asset_id")
+        edit_prompt = data.get("edit_prompt")
+        if not asset_id or not edit_prompt:
+            return jsonify({"error": "asset_id and edit_prompt required"}), 400
+        jm = _get_job_manager()
+        job_id = jm.create_edit_job(asset_id, edit_prompt)
+        return jsonify({"job_id": job_id}), 202
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/detect-problems/<asset_id>', methods=['POST'])
+def model_ai_detect_problems(asset_id):
+    """Use vision AI to detect structural problems in a model."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.editor import detect_problems
+        from apps.asset_pipeline.registry import AssetRegistry
+        registry = _get_pipeline().registry
+        result = detect_problems(asset_id, registry)
+        if "error" in result:
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/suggest-fixes/<asset_id>', methods=['POST'])
+def model_ai_suggest_fixes(asset_id):
+    """Generate fix suggestions for detected problems."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.editor import suggest_fixes
+        data = request.json or {}
+        problems = data.get("problems", [])
+        if not problems:
+            return jsonify({"error": "problems list required"}), 400
+        registry = _get_pipeline().registry
+        result = suggest_fixes(asset_id, problems, registry)
+        if "error" in result:
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/references/<asset_id>', methods=['GET'])
+def model_ai_list_references(asset_id):
+    """List reference images for an asset."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.references import list_references
+        registry = _get_pipeline().registry
+        result = list_references(asset_id, registry)
+        if "error" in result:
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/references/<asset_id>', methods=['POST'])
+def model_ai_upload_reference(asset_id):
+    """Upload a reference image for an asset."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.references import save_reference
+        registry = _get_pipeline().registry
+
+        if 'file' not in request.files:
+            return jsonify({"error": "No file uploaded"}), 400
+        f = request.files['file']
+        if not f.filename:
+            return jsonify({"error": "No filename"}), 400
+        image_data = f.read()
+        result = save_reference(asset_id, image_data, f.filename, registry)
+        if not result.get("success"):
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/references/<asset_id>/<filename>', methods=['DELETE'])
+def model_ai_delete_reference(asset_id, filename):
+    """Delete a reference image."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.references import delete_reference
+        registry = _get_pipeline().registry
+        result = delete_reference(asset_id, filename, registry)
+        if not result.get("success"):
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/model-ai/analyze-references/<asset_id>', methods=['POST'])
+def model_ai_analyze_references(asset_id):
+    """Analyze reference images using vision AI."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.references import analyze_references
+        registry = _get_pipeline().registry
+        result = analyze_references(asset_id, registry)
+        if "error" in result:
+            return jsonify(result), 400
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ============================================================================
+# PLACEMENT ROUTES
+# ============================================================================
+
+@app.route('/api/model-ai/placement-preview/<asset_id>', methods=['POST'])
+def model_ai_placement_preview(asset_id):
+    """Query scene and suggest placement for an asset."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.placement import query_scene_context, suggest_placement
+        registry = _get_pipeline().registry
+        record = registry.get(asset_id)
+        if not record:
+            return jsonify({"error": "Asset not found"}), 404
+        scene = query_scene_context()
+        suggestion = suggest_placement(record, scene)
+        return jsonify({
+            "scene_summary": {
+                "total_actors": scene["total_actors"],
+                "buildings": len(scene["buildings"]),
+                "props": len(scene["props"]),
+                "devices": len(scene["devices"]),
+            },
+            "suggestion": suggestion,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/pipeline/import-and-place/<asset_id>', methods=['POST'])
+def pipeline_import_and_place(asset_id):
+    """Import asset to UEFN and place it in the scene in one step."""
+    try:
+        import sys
+        if str(WORKSPACE_ROOT) not in sys.path:
+            sys.path.insert(0, str(WORKSPACE_ROOT))
+        from apps.asset_pipeline.placement import query_scene_context, suggest_placement, place_asset
+
+        pipeline = _get_pipeline()
+        record = pipeline.registry.get(asset_id)
+        if not record:
+            return jsonify({"error": "Asset not found"}), 404
+
+        # Import first if not already imported
+        if record.status != "imported" or not record.uefn_import_path:
+            import_result = pipeline.import_asset(asset_id)
+            if not import_result.get("success"):
+                return jsonify({"error": f"Import failed: {import_result.get('error')}"}), 500
+            record = pipeline.registry.get(asset_id)
+
+        # Get placement suggestion from AI
+        data = request.json or {}
+        if "position" in data:
+            # User specified position directly
+            position = data["position"]
+            rotation = data.get("rotation", {"yaw": 0})
+            scale = data.get("scale", 1.0)
+            reasoning = "User-specified position"
+            placement_type = "manual"
+        else:
+            # AI suggests placement based on scene
+            scene = query_scene_context()
+            suggestion = suggest_placement(record, scene)
+            position = suggestion["position"]
+            rotation = suggestion["rotation"]
+            scale = suggestion["scale"]
+            reasoning = suggestion["reasoning"]
+            placement_type = suggestion["placement_type"]
+
+        # Place in UEFN
+        place_result = place_asset(record, position, rotation, scale)
+        if not place_result.get("success"):
+            return jsonify({"error": place_result.get("error")}), 500
+
+        return jsonify({
+            "success": True,
+            "asset_id": asset_id,
+            "uefn_path": record.uefn_import_path,
+            "position": position,
+            "rotation": rotation,
+            "scale": scale,
+            "reasoning": reasoning,
+            "placement_type": placement_type,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.errorhandler(404)
