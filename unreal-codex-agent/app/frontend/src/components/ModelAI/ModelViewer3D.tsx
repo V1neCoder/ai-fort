@@ -219,11 +219,62 @@ export function useCameraPresets() {
     return presets;
 }
 
+/** Check if WebGL is available before mounting Canvas */
+function isWebGLAvailable(): boolean {
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+        if (gl) {
+            // Immediately lose the context so we don't waste one on the test
+            const ext = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context');
+            if (ext) ext.loseContext();
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
+    }
+}
+
+/** Fallback viewer using model-viewer web component */
+function FallbackViewer({ glbUrl }: { glbUrl: string }) {
+    return (
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* @ts-ignore */}
+            <model-viewer
+                src={glbUrl}
+                alt="3D model"
+                auto-rotate camera-controls shadow-intensity="1"
+                style={{ width: '100%', flex: 1, backgroundColor: '#0a0a15', minHeight: 300 }}
+            />
+            <div style={{ padding: '6px 12px', fontSize: 11, color: '#666', textAlign: 'center', background: '#12122a' }}>
+                Using basic viewer (WebGL context limit reached). Close other 3D previews for advanced mode.
+            </div>
+        </div>
+    );
+}
+
 export default function ModelViewer3D({
     glbUrl, viewMode, autoRotate = true, onMeshStats, screenshotTrigger = 0
 }: ModelViewer3DProps) {
+    const [webglOk, setWebglOk] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        setWebglOk(isWebGLAvailable());
+    }, [glbUrl]);
+
     if (!glbUrl) {
         return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#555' }}>No model loaded</div>;
+    }
+
+    // Still checking
+    if (webglOk === null) {
+        return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666' }}>Initializing viewer...</div>;
+    }
+
+    // WebGL unavailable — fall back to model-viewer
+    if (!webglOk) {
+        return <FallbackViewer glbUrl={glbUrl} />;
     }
 
     return (

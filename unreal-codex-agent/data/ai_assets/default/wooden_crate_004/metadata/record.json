@@ -1,0 +1,93 @@
+{
+  "asset_id": "0bd0f3b5b386",
+  "name": "wooden_crate_004",
+  "category": "prop",
+  "project": "default",
+  "prompt": "create  a crate",
+  "spec": {
+    "prompt": "create  a crate",
+    "asset_name": "wooden_crate",
+    "category": "prop",
+    "purpose": "storage container",
+    "required_components": [
+      "base",
+      "sides",
+      "top"
+    ],
+    "expected_silhouette": "rectangular box",
+    "scale_range_cm": {
+      "min_width": 40,
+      "max_width": 120,
+      "min_height": 30,
+      "max_height": 90,
+      "min_depth": 40,
+      "max_depth": 120
+    },
+    "interior_required": false,
+    "failure_conditions": [
+      "incorrect proportions",
+      "missing components",
+      "unrealistic texture"
+    ],
+    "style": "rustic",
+    "color_palette": [
+      "#964B00",
+      "#786C3B",
+      "#452B1F"
+    ]
+  },
+  "version": 1,
+  "status": "approved",
+  "created_at": "2026-03-26T06:22:10.860032+00:00",
+  "updated_at": "2026-03-26T06:22:12.980675+00:00",
+  "glb_path": "C:\\AI Fort\\unreal-codex-agent\\data\\ai_assets\\default\\wooden_crate_004\\exports\\wooden_crate_004_v1.glb",
+  "preview_screenshots": [
+    "v1_placeholder.png"
+  ],
+  "generated_code": "import trimesh\nimport numpy as np\n\n# Define dimensions\nwidth = 80\nheight = 60\ndepth = 80\nwall_thickness = 2\n\n# Create base\nbase = trimesh.creation.box(extents=[width, depth, wall_thickness])\nbase.visual.face_colors = [160, 110, 60, 255]\n\n# Create sides\nside1 = trimesh.creation.box(extents=[width, wall_thickness, height - wall_thickness])\nside1.apply_translation([0, depth/2 - wall_thickness/2, height/2 - wall_thickness/2])\nside1.visual.face_colors = [160, 110, 60, 255]\n\nside2 = trimesh.creation.box(extents=[depth, wall_thickness, height - wall_thickness])\nside2.apply_translation([width/2 - wall_thickness/2, 0, height/2 - wall_thickness/2])\nside2.visual.face_colors = [160, 110, 60, 255]\n\nside3 = trimesh.creation.box(extents=[width, wall_thickness, height - wall_thickness])\nside3.apply_translation([0, -depth/2 + wall_thickness/2, height/2 - wall_thickness/2])\nside3.visual.face_colors = [160, 110, 60, 255]\n\nside4 = trimesh.creation.box(extents=[depth, wall_thickness, height - wall_thickness])\nside4.apply_translation([-width/2 + wall_thickness/2, 0, height/2 - wall_thickness/2])\nside4.visual.face_colors = [160, 110, 60, 255]\n\n# Create top\ntop = trimesh.creation.box(extents=[width, depth, wall_thickness])\ntop.apply_translation([0, 0, height - wall_thickness/2])\ntop.visual.face_colors = [160, 110, 60, 255]\n\n# Create scene\nscene = trimesh.Scene()\n\n# Add components to scene\nscene.add_geometry(base, node_name=\"base\")\nscene.add_geometry(side1, node_name=\"side1\")\nscene.add_geometry(side2, node_name=\"side2\")\nscene.add_geometry(side3, node_name=\"side3\")\nscene.add_geometry(side4, node_name=\"side4\")\nscene.add_geometry(top, node_name=\"top\")",
+  "validation_results": [
+    {
+      "passed": true,
+      "overall_score": 0.5,
+      "checks": [],
+      "issues": [
+        "Validation error: ValidationCheck.__init__() got an unexpected keyword argument 'description'"
+      ],
+      "recommendations": []
+    }
+  ],
+  "fix_history": [],
+  "latest_validation": {
+    "passed": true,
+    "overall_score": 0.5,
+    "checks": [],
+    "issues": [
+      "Validation error: ValidationCheck.__init__() got an unexpected keyword argument 'description'"
+    ],
+    "recommendations": []
+  },
+  "uefn_import_path": "",
+  "imported_at": "",
+  "reference_images": [],
+  "tags": [],
+  "generation_provider": "free_ai",
+  "vertex_count": 48,
+  "face_count": 72,
+  "bounds_cm": {
+    "min": [
+      -79.0,
+      -40.0,
+      -1.0
+    ],
+    "max": [
+      79.0,
+      40.0,
+      60.0
+    ],
+    "size": [
+      158.0,
+      80.0,
+      61.0
+    ]
+  }
+}

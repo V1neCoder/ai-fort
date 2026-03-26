@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "overall_score": 0.5,
+  "checks": [],
+  "issues": [
+    "Validation error: ValidationCheck.__init__() got an unexpected keyword argument 'description'"
+  ],
+  "recommendations": []
+}
