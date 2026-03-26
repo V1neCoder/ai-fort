@@ -1736,12 +1736,16 @@ def run_smoke_checks(repo_root: Path) -> None:
         )
         _print_check("start_agent.ps1")
 
-        _run(
-            "setup_free_stack.ps1",
-            powershell + [str(repo_root / "scripts" / "setup_free_stack.ps1")],
-            cwd=repo_root,
-        )
-        _print_check("setup_free_stack.ps1")
+        setup_free_stack_ps1 = repo_root / "scripts" / "setup_free_stack.ps1"
+        if setup_free_stack_ps1.exists():
+            _run(
+                "setup_free_stack.ps1",
+                powershell + [str(setup_free_stack_ps1)],
+                cwd=repo_root,
+            )
+            _print_check("setup_free_stack.ps1")
+        else:
+            print("[skip] setup_free_stack.ps1: script not present")
 
         _run(
             "clean_session.ps1",

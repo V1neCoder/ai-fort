@@ -13,7 +13,28 @@ $VenvPath = Join-Path $RepoRoot ".venv"
 $PythonExe = Join-Path $VenvPath "Scripts\python.exe"
 $ActivateScript = Join-Path $VenvPath "Scripts\Activate.ps1"
 
-if (Test-Path $ActivateScript) {
+function Test-PythonDependency {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PythonPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ModuleName
+    )
+
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+
+    try {
+        & $PythonPath -c "import $ModuleName" 1> $null 2> $null
+        return ($LASTEXITCODE -eq 0)
+    } catch {
+        return $false
+    }
+}
+
+if ((Test-Path $ActivateScript) -and (Test-PythonDependency -PythonPath $PythonExe -ModuleName "typer")) {
     . $ActivateScript
 } else {
     $PythonCommand = Get-Command python -ErrorAction SilentlyContinue
@@ -21,6 +42,9 @@ if (Test-Path $ActivateScript) {
         throw "Virtual environment not found and no python executable is available on PATH."
     }
     $PythonExe = $PythonCommand.Source
+    if (-not (Test-PythonDependency -PythonPath $PythonExe -ModuleName "typer")) {
+        throw "No usable python interpreter with required dependency 'typer' is available."
+    }
 }
 
 $SessionPath = Join-Path (Join-Path $RepoRoot "data\sessions") $SessionId
@@ -71,6 +95,11 @@ $DirtyZoneResultRaw = & $PythonExe -m apps.mcp_extensions.scene_tools dirty-zone
     --scene-state-json $SceneStatePath `
     --cycle-number $CycleNumber `
     --repo-root $RepoRoot
+
+$DirtyZoneResultText = ($DirtyZoneResultRaw | Out-String).Trim()
+if ([string]::IsNullOrWhiteSpace($DirtyZoneResultText)) {
+    throw "Could not derive dirty zone for cycle ${CycleNumber}: no output was returned."
+}
 
 $DirtyZoneResult = $DirtyZoneResultRaw | ConvertFrom-Json
 if ($DirtyZoneResult.status -ne "ok") {

@@ -3,7 +3,7 @@ import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import {
     Menu, X, Settings, Zap, Package, Code,
-    AlertCircle, CheckCircle, Download, WifiOff, MessageSquare
+    AlertCircle, CheckCircle, Download, WifiOff, MessageSquare, Wand2
 } from 'lucide-react';
 
 import './App.css';
@@ -13,6 +13,7 @@ import CodexPanel from './components/CodexPanel';
 import SettingsPanel from './components/SettingsPanel';
 import ChatPanel from './components/ChatPanel';
 import StatusBar from './components/StatusBar';
+import AssetPipeline from './components/AssetPipeline';
 
 // Create context for backend URL
 export const AppContext = createContext<{
@@ -195,6 +196,10 @@ function App() {
                                     <Download size={18} />
                                     Assets
                                 </Link>
+                                <Link to="/pipeline" className="nav-link">
+                                    <Wand2 size={18} />
+                                    Pipeline
+                                </Link>
                                 <Link to="/codex" className="nav-link">
                                     <Code size={18} />
                                     Codex
@@ -236,6 +241,7 @@ function App() {
                             <Route path="/" element={<ChatPanel backendUrl={state.backendUrl} />} />
                             <Route path="/tools" element={<ToolDashboard backendUrl={state.backendUrl} />} />
                             <Route path="/assets" element={<AssetBrowser backendUrl={state.backendUrl} />} />
+                            <Route path="/pipeline" element={<AssetPipeline backendUrl={state.backendUrl} />} />
                             <Route path="/codex" element={<CodexPanel backendUrl={state.backendUrl} />} />
                             <Route path="/settings" element={<SettingsPanel appInfo={state.appInfo} backendUrl={state.backendUrl} />} />
                         </Routes>

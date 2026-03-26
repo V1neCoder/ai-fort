@@ -33,7 +33,7 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #         "function": [
 #           "utility"
 #         ],
-#         "mount_type": "floor",
+#         "mount_type": "wall",
 #         "placement_behavior": [
 #           "derived_from_live_scene"
 #         ],
@@ -53,50 +53,55 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #     "managed_slot": "primary",
 #     "placement_hint": {
 #       "anchor_point": [
-#         4310.0,
-#         4200.0,
-#         310.0
+#         7600.0,
+#         6610.0,
+#         150.0
 #       ],
-#       "anchor_preference": "surface_anchor",
+#       "anchor_preference": "plane_center",
 #       "compatible_mount_types": [
-#         "floor",
-#         "surface"
+#         "corner",
+#         "opening",
+#         "wall"
 #       ],
 #       "corner_anchor": null,
 #       "duplicate_policy": "cleanup_managed",
-#       "expected_mount_type": "floor",
+#       "expected_mount_type": "wall",
 #       "ground_anchor": null,
 #       "interference_policy": "avoid",
 #       "landscape_anchor": null,
 #       "lock_roll_to_zero": true,
-#       "mount_type": "floor",
-#       "parent_support_actor": "UCA_House_FloorUpperRight",
+#       "mount_type": "wall",
+#       "parent_support_actor": "UCA_BlueWall_Back",
 #       "placement_behavior": [
 #         "derived_from_live_scene"
 #       ],
-#       "placement_family": "floor",
+#       "placement_family": "wall",
 #       "placement_phase": "initial_place",
-#       "plane_anchor": null,
+#       "plane_anchor": [
+#         7600.0,
+#         6610.0,
+#         150.0
+#       ],
 #       "preferred_pitch_step_deg": 0.0,
-#       "preferred_yaw_step_deg": 0.0,
-#       "reference_actor_label": "UCA_House_FloorUpperRight",
+#       "preferred_yaw_step_deg": 90.0,
+#       "reference_actor_label": "UCA_BlueWall_Back",
 #       "reference_pitch_deg": 0.0,
 #       "reference_yaw_deg": 0.0,
 #       "requires_uniform_scale": true,
-#       "snap_grid_cm": 0.0,
+#       "snap_grid_cm": 5.0,
 #       "snap_policy": "initial_only",
-#       "support_actor_label": "UCA_House_FloorUpperRight",
-#       "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E73828CA02_1415013850",
+#       "support_actor_label": "UCA_BlueWall_Back",
+#       "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E7380FCA02_1690069473",
 #       "support_level": 1,
 #       "support_reference_policy": "selected_first",
-#       "support_surface_kind": "upper_slab",
+#       "support_surface_kind": "wall_surface",
 #       "surface_anchor": [
-#         4310.0,
-#         4200.0,
-#         320.0
+#         7600.0,
+#         6610.0,
+#         300.0
 #       ]
 #     },
-#     "placement_reference_actor": "UCA_House_FloorUpperRight",
+#     "placement_reference_actor": "UCA_BlueWall_Back",
 #     "placement_strategy": "asset_anchor_snap",
 #     "raw": {
 #       "action": "place_asset",
@@ -120,7 +125,7 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #           "function": [
 #             "utility"
 #           ],
-#           "mount_type": "floor",
+#           "mount_type": "wall",
 #           "placement_behavior": [
 #             "derived_from_live_scene"
 #           ],
@@ -140,59 +145,64 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #       "managed_slot": "primary",
 #       "placement_hint": {
 #         "anchor_point": [
-#           4310.0,
-#           4200.0,
-#           310.0
+#           7600.0,
+#           6610.0,
+#           150.0
 #         ],
-#         "anchor_preference": "surface_anchor",
+#         "anchor_preference": "plane_center",
 #         "compatible_mount_types": [
-#           "floor",
-#           "surface"
+#           "corner",
+#           "opening",
+#           "wall"
 #         ],
 #         "corner_anchor": null,
 #         "duplicate_policy": "cleanup_managed",
-#         "expected_mount_type": "floor",
+#         "expected_mount_type": "wall",
 #         "ground_anchor": null,
 #         "interference_policy": "avoid",
 #         "landscape_anchor": null,
 #         "lock_roll_to_zero": true,
-#         "mount_type": "floor",
-#         "parent_support_actor": "UCA_House_FloorUpperRight",
+#         "mount_type": "wall",
+#         "parent_support_actor": "UCA_BlueWall_Back",
 #         "placement_behavior": [
 #           "derived_from_live_scene"
 #         ],
-#         "placement_family": "floor",
+#         "placement_family": "wall",
 #         "placement_phase": "initial_place",
-#         "plane_anchor": null,
+#         "plane_anchor": [
+#           7600.0,
+#           6610.0,
+#           150.0
+#         ],
 #         "preferred_pitch_step_deg": 0.0,
-#         "preferred_yaw_step_deg": 0.0,
-#         "reference_actor_label": "UCA_House_FloorUpperRight",
+#         "preferred_yaw_step_deg": 90.0,
+#         "reference_actor_label": "UCA_BlueWall_Back",
 #         "reference_pitch_deg": 0.0,
 #         "reference_yaw_deg": 0.0,
 #         "requires_uniform_scale": true,
-#         "snap_grid_cm": 0.0,
+#         "snap_grid_cm": 5.0,
 #         "snap_policy": "initial_only",
-#         "support_actor_label": "UCA_House_FloorUpperRight",
-#         "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E73828CA02_1415013850",
+#         "support_actor_label": "UCA_BlueWall_Back",
+#         "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E7380FCA02_1690069473",
 #         "support_level": 1,
 #         "support_reference_policy": "selected_first",
-#         "support_surface_kind": "upper_slab",
+#         "support_surface_kind": "wall_surface",
 #         "surface_anchor": [
-#           4310.0,
-#           4200.0,
-#           320.0
+#           7600.0,
+#           6610.0,
+#           300.0
 #         ]
 #       },
-#       "placement_reference_actor": "UCA_House_FloorUpperRight",
+#       "placement_reference_actor": "UCA_BlueWall_Back",
 #       "placement_strategy": "asset_anchor_snap",
 #       "reason": "Selected the top-ranked shortlisted asset using structural placement hints.",
-#       "spawn_label": "SM_PG_Bot_Beacon_zone_0001",
+#       "spawn_label": "SM_PG_Bot_Beacon_UCA_BlueWall_Back",
 #       "target_zone": "zone_0001",
 #       "transform": {
 #         "location": [
-#           4310.0,
-#           4200.0,
-#           320.0
+#           7600.0,
+#           6610.0,
+#           150.0
 #         ],
 #         "rotation": [
 #           0.0,
@@ -207,13 +217,13 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #       }
 #     },
 #     "reason": "Selected the top-ranked shortlisted asset using structural placement hints.",
-#     "spawn_label": "SM_PG_Bot_Beacon_zone_0001",
+#     "spawn_label": "SM_PG_Bot_Beacon_UCA_BlueWall_Back",
 #     "target_zone": "zone_0001",
 #     "transform": {
 #       "location": [
-#         4310.0,
-#         4200.0,
-#         320.0
+#         7600.0,
+#         6610.0,
+#         150.0
 #       ],
 #       "rotation": [
 #         0.0,
@@ -231,47 +241,51 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #   "debug_overlay": {
 #     "action": "place_asset",
 #     "anchor_point": [
-#       4310.0,
-#       4200.0,
-#       310.0
+#       7600.0,
+#       6610.0,
+#       150.0
 #     ],
 #     "asset_path": "/Game/Creative/Sets/PropSets/Playgrounds/Meshes/SM_PG_Bot_Beacon.SM_PG_Bot_Beacon",
 #     "corner_anchor": null,
 #     "dirty_bounds": {
 #       "box_extent": [
-#         260.0,
-#         320.0,
-#         10.0
+#         220.0,
+#         220.0,
+#         155.0
 #       ],
 #       "origin": [
-#         4310.0,
-#         4200.0,
-#         310.0
+#         7600.0,
+#         6400.0,
+#         145.0
 #       ]
 #     },
 #     "ground_anchor": null,
 #     "identity_policy": "reuse_or_create",
 #     "landscape_anchor": null,
 #     "managed_slot": "primary",
-#     "parent_support_actor": "UCA_House_FloorUpperRight",
+#     "parent_support_actor": "UCA_BlueWall_Back",
 #     "placement_strategy": "asset_anchor_snap",
-#     "plane_anchor": null,
-#     "reference_actor_label": "UCA_House_FloorUpperRight",
+#     "plane_anchor": [
+#       7600.0,
+#       6610.0,
+#       150.0
+#     ],
+#     "reference_actor_label": "UCA_BlueWall_Back",
 #     "room_type": "living_room",
-#     "spawn_label": "SM_PG_Bot_Beacon_zone_0001",
+#     "spawn_label": "SM_PG_Bot_Beacon_UCA_BlueWall_Back",
 #     "support_actor_class": "FortStaticMeshActor",
-#     "support_actor_label": "UCA_House_FloorUpperRight",
+#     "support_actor_label": "UCA_BlueWall_Back",
 #     "support_level": 1,
-#     "support_surface_kind": "upper_slab",
+#     "support_surface_kind": "wall_surface",
 #     "surface_anchor": [
-#       4310.0,
-#       4200.0,
-#       320.0
+#       7600.0,
+#       6610.0,
+#       300.0
 #     ],
 #     "target_location": [
-#       4310.0,
-#       4200.0,
-#       320.0
+#       7600.0,
+#       6610.0,
+#       150.0
 #     ],
 #     "target_rotation": [
 #       0.0,
@@ -287,45 +301,50 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 #   },
 #   "placement_summary": {
 #     "anchor_point": [
-#       4310.0,
-#       4200.0,
-#       310.0
+#       7600.0,
+#       6610.0,
+#       150.0
 #     ],
-#     "anchor_preference": "surface_anchor",
+#     "anchor_preference": "plane_center",
 #     "compatible_mount_types": [
-#       "floor",
-#       "surface"
+#       "corner",
+#       "opening",
+#       "wall"
 #     ],
 #     "corner_anchor": null,
 #     "duplicate_policy": "reuse",
-#     "expected_mount_type": "floor",
+#     "expected_mount_type": "wall",
 #     "ground_anchor": null,
 #     "interference_policy": "avoid",
 #     "landscape_anchor": null,
 #     "lock_roll_to_zero": true,
-#     "mount_type": "floor",
-#     "parent_support_actor": "UCA_House_FloorUpperRight",
+#     "mount_type": "wall",
+#     "parent_support_actor": "UCA_BlueWall_Back",
 #     "placement_behavior": [],
-#     "placement_family": "floor",
+#     "placement_family": "wall",
 #     "placement_phase": "initial_place",
-#     "plane_anchor": null,
+#     "plane_anchor": [
+#       7600.0,
+#       6610.0,
+#       150.0
+#     ],
 #     "preferred_pitch_step_deg": 0.0,
-#     "preferred_yaw_step_deg": 0.0,
-#     "reference_actor_label": "UCA_House_FloorUpperRight",
+#     "preferred_yaw_step_deg": 90.0,
+#     "reference_actor_label": "UCA_BlueWall_Back",
 #     "reference_pitch_deg": 0.0,
 #     "reference_yaw_deg": 0.0,
 #     "requires_uniform_scale": true,
-#     "snap_grid_cm": 0.0,
+#     "snap_grid_cm": 5.0,
 #     "snap_policy": "initial_only",
-#     "support_actor_label": "UCA_House_FloorUpperRight",
-#     "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E73828CA02_1415013850",
+#     "support_actor_label": "UCA_BlueWall_Back",
+#     "support_actor_path": "/MyProjectA/MyProjectA.MyProjectA:PersistentLevel.FortStaticMeshActor_UAID_309C2385E7380FCA02_1690069473",
 #     "support_level": 1,
 #     "support_reference_policy": "selected_first",
-#     "support_surface_kind": "upper_slab",
+#     "support_surface_kind": "wall_surface",
 #     "surface_anchor": [
-#       4310.0,
-#       4200.0,
-#       320.0
+#       7600.0,
+#       6610.0,
+#       300.0
 #     ]
 #   },
 #   "project_name": "unreal-codex-agent",
@@ -338,9 +357,10 @@ DebugDraw_zone_0001:debug_draw = debug_draw{Channel := UCA_DebugDraw_zone_0001}
 UCA_PlacementCoordinator_zone_0001 := class(creative_device):
     OnBegin<override>() : void =
         Print("UCA placement coordinator ready for zone zone_0001 (cycle 1).")
-        Print("Support surface: UCA_House_FloorUpperRight (upper_slab).")
+        Print("Support surface: UCA_BlueWall_Back (wall_surface).")
         Print("Enable Verse Debug Draw to see the placement overlay markers.")
-        DebugDraw_zone_0001.DrawBox(vector3{X:=4310.0, Y:=4200.0, Z:=310.0}, rotation{}, ?Extent := vector3{X:=260.0, Y:=320.0, Z:=10.0}, ?Color := MakeColorFromSRGBValues(96, 125, 139), ?Thickness := 4.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
-        DebugDraw_zone_0001.DrawSphere(Center := vector3{X:=4310.0, Y:=4200.0, Z:=320.0}, ?Radius := 70.0, ?Color := MakeColorFromSRGBValues(255, 215, 0), ?Thickness := 5.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
-        DebugDraw_zone_0001.DrawPoint(Position := vector3{X:=4310.0, Y:=4200.0, Z:=320.0}, ?Color := MakeColorFromSRGBValues(255, 255, 255), ?Thickness := 60.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
-        DebugDraw_zone_0001.DrawPoint(Position := vector3{X:=4310.0, Y:=4200.0, Z:=320.0}, ?Color := MakeColorFromSRGBValues(255, 140, 0), ?Thickness := 36.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
+        DebugDraw_zone_0001.DrawBox(vector3{X:=7600.0, Y:=6400.0, Z:=145.0}, rotation{}, ?Extent := vector3{X:=220.0, Y:=220.0, Z:=155.0}, ?Color := MakeColorFromSRGBValues(96, 125, 139), ?Thickness := 4.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
+        DebugDraw_zone_0001.DrawSphere(Center := vector3{X:=7600.0, Y:=6610.0, Z:=150.0}, ?Radius := 70.0, ?Color := MakeColorFromSRGBValues(255, 215, 0), ?Thickness := 5.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
+        DebugDraw_zone_0001.DrawPoint(Position := vector3{X:=7600.0, Y:=6610.0, Z:=150.0}, ?Color := MakeColorFromSRGBValues(255, 255, 255), ?Thickness := 60.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
+        DebugDraw_zone_0001.DrawPoint(Position := vector3{X:=7600.0, Y:=6610.0, Z:=150.0}, ?Color := MakeColorFromSRGBValues(255, 99, 71), ?Thickness := 36.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)
+        DebugDraw_zone_0001.DrawPoint(Position := vector3{X:=7600.0, Y:=6610.0, Z:=300.0}, ?Color := MakeColorFromSRGBValues(255, 140, 0), ?Thickness := 36.0, ?DrawDurationPolicy := debug_draw_duration_policy.Persistent)

@@ -92,6 +92,106 @@ class HouseSpec:
     grid_safe_joints: bool = True
 
 
+ENCLOSED_GENERATIVE_STRUCTURE_TYPES = {
+    "garage",
+    "shed",
+    "workshop",
+    "barn",
+    "warehouse",
+    "greenhouse",
+    "studio",
+    "hangar",
+    "kiosk",
+}
+
+OPEN_GENERATIVE_STRUCTURE_TYPES = {
+    "pavilion",
+    "gazebo",
+    "pergola",
+    "canopy",
+    "carport",
+    "market_stall",
+}
+
+SUPPORTED_GENERATIVE_STRUCTURE_TYPES = (
+    ENCLOSED_GENERATIVE_STRUCTURE_TYPES | OPEN_GENERATIVE_STRUCTURE_TYPES
+)
+
+STRUCTURE_TYPE_ALIASES = {
+    "garage": "garage",
+    "car garage": "garage",
+    "auto garage": "garage",
+    "workshop": "workshop",
+    "shop": "workshop",
+    "barn": "barn",
+    "shed": "shed",
+    "tool shed": "shed",
+    "storage shed": "shed",
+    "warehouse": "warehouse",
+    "storage building": "warehouse",
+    "greenhouse": "greenhouse",
+    "glasshouse": "greenhouse",
+    "studio": "studio",
+    "art studio": "studio",
+    "hangar": "hangar",
+    "aircraft hangar": "hangar",
+    "kiosk": "kiosk",
+    "booth": "kiosk",
+    "pavilion": "pavilion",
+    "gazebo": "gazebo",
+    "pergola": "pergola",
+    "canopy": "canopy",
+    "carport": "carport",
+    "market stall": "market_stall",
+    "stall": "market_stall",
+}
+
+
+@dataclass(frozen=True)
+class StructureSpec:
+    zone_id: str
+    structure_type: str
+    center_x: float
+    center_y: float
+    support_z: float
+    width_cm: float = 720.0
+    depth_cm: float = 620.0
+    wall_height_cm: float = 280.0
+    wall_thickness_cm: float = 20.0
+    floor_thickness_cm: float = 20.0
+    door_width_cm: float = 120.0
+    door_height_cm: float = 220.0
+    opening_width_cm: float = 260.0
+    opening_height_cm: float = 235.0
+    roof_style: str = "gable"
+    roof_pitch_deg: float = 28.0
+    roof_thickness_cm: float = 18.0
+    roof_overhang_cm: float = 24.0
+    roof_rise_cm: float = 110.0
+    roof_ridge_thickness_cm: float = 8.0
+    gable_infill_step_count: int = 3
+    post_thickness_cm: float = 20.0
+    beam_thickness_cm: float = 14.0
+    railing_height_cm: float = 90.0
+    grid_snap_cm: float = 10.0
+    asset_path: str = "/Engine/BasicShapes/Cube.Cube"
+    label_prefix: str = "UCA_Structure"
+    support_surface_kind: str = "support_surface"
+    support_level: int = 0
+    support_actor_label: str = ""
+    parent_support_actor: str = ""
+    support_reference_policy: str = "explicit_only"
+    corner_join_style: str = "butt_join"
+    grid_safe_joints: bool = True
+
+
+def canonical_structure_type(value: Any, fallback: str = "shed") -> str:
+    normalized = _safe_text(value).lower()
+    if normalized in SUPPORTED_GENERATIVE_STRUCTURE_TYPES:
+        return normalized
+    return STRUCTURE_TYPE_ALIASES.get(normalized, fallback)
+
+
 def normalize_box_room_spec(spec: BoxRoomSpec) -> BoxRoomSpec:
     inner_width = max(100.0, _safe_float(spec.inner_width_cm, 400.0))
     inner_depth = max(100.0, _safe_float(spec.inner_depth_cm, 400.0))
@@ -183,6 +283,72 @@ def normalize_house_spec(spec: HouseSpec) -> HouseSpec:
         grid_snap_cm=max(0.0, _safe_float(spec.grid_snap_cm, 10.0)),
         asset_path=str(spec.asset_path or "/Engine/BasicShapes/Cube.Cube"),
         label_prefix=str(spec.label_prefix or "UCA_House"),
+        support_surface_kind=str(spec.support_surface_kind or "support_surface"),
+        support_level=int(spec.support_level or 0),
+        support_actor_label=str(spec.support_actor_label or ""),
+        parent_support_actor=str(spec.parent_support_actor or spec.support_actor_label or ""),
+        support_reference_policy=str(spec.support_reference_policy or "explicit_only"),
+        corner_join_style=corner_join_style,
+        grid_safe_joints=bool(spec.grid_safe_joints),
+    )
+
+
+def normalize_structure_spec(spec: StructureSpec) -> StructureSpec:
+    structure_type = canonical_structure_type(spec.structure_type, fallback="shed")
+    width_cm = max(260.0, _safe_float(spec.width_cm, 720.0))
+    depth_cm = max(260.0, _safe_float(spec.depth_cm, 620.0))
+    wall_height_cm = max(180.0, _safe_float(spec.wall_height_cm, 280.0))
+    wall_thickness_cm = max(8.0, _safe_float(spec.wall_thickness_cm, 20.0))
+    floor_thickness_cm = max(8.0, _safe_float(spec.floor_thickness_cm, 20.0))
+    door_width_cm = max(80.0, min(width_cm - 80.0, _safe_float(spec.door_width_cm, 120.0)))
+    door_height_cm = max(120.0, min(wall_height_cm - 20.0, _safe_float(spec.door_height_cm, 220.0)))
+    opening_width_cm = max(120.0, min(width_cm - 60.0, _safe_float(spec.opening_width_cm, 260.0)))
+    opening_height_cm = max(140.0, min(wall_height_cm - 12.0, _safe_float(spec.opening_height_cm, 235.0)))
+    roof_style = _safe_text(spec.roof_style).lower() or "gable"
+    if structure_type == "pergola":
+        roof_style = "beam"
+    elif roof_style not in {"gable", "beam"}:
+        roof_style = "gable"
+    roof_pitch_deg = max(8.0, min(50.0, _safe_float(spec.roof_pitch_deg, 28.0)))
+    roof_thickness_cm = max(6.0, _safe_float(spec.roof_thickness_cm, 18.0))
+    roof_overhang_cm = max(0.0, _safe_float(spec.roof_overhang_cm, 24.0))
+    roof_rise_cm = max(30.0, _safe_float(spec.roof_rise_cm, 110.0))
+    roof_ridge_thickness_cm = max(4.0, _safe_float(spec.roof_ridge_thickness_cm, 8.0))
+    gable_infill_step_count = max(2, min(6, int(spec.gable_infill_step_count or 3)))
+    post_thickness_cm = max(10.0, _safe_float(spec.post_thickness_cm, 20.0))
+    beam_thickness_cm = max(8.0, _safe_float(spec.beam_thickness_cm, 14.0))
+    railing_height_cm = max(60.0, _safe_float(spec.railing_height_cm, 90.0))
+    corner_join_style = _safe_text(spec.corner_join_style).lower() or "butt_join"
+    if corner_join_style not in {"butt_join", "overlap"}:
+        corner_join_style = "butt_join"
+    return StructureSpec(
+        zone_id=_safe_text(spec.zone_id) or "zone_structure",
+        structure_type=structure_type,
+        center_x=_snap(_safe_float(spec.center_x, 0.0), max(0.0, _safe_float(spec.grid_snap_cm, 10.0))),
+        center_y=_snap(_safe_float(spec.center_y, 0.0), max(0.0, _safe_float(spec.grid_snap_cm, 10.0))),
+        support_z=_snap(_safe_float(spec.support_z, 0.0), max(0.0, _safe_float(spec.grid_snap_cm, 10.0))),
+        width_cm=width_cm,
+        depth_cm=depth_cm,
+        wall_height_cm=wall_height_cm,
+        wall_thickness_cm=wall_thickness_cm,
+        floor_thickness_cm=floor_thickness_cm,
+        door_width_cm=door_width_cm,
+        door_height_cm=door_height_cm,
+        opening_width_cm=opening_width_cm,
+        opening_height_cm=opening_height_cm,
+        roof_style=roof_style,
+        roof_pitch_deg=roof_pitch_deg,
+        roof_thickness_cm=roof_thickness_cm,
+        roof_overhang_cm=roof_overhang_cm,
+        roof_rise_cm=roof_rise_cm,
+        roof_ridge_thickness_cm=roof_ridge_thickness_cm,
+        gable_infill_step_count=gable_infill_step_count,
+        post_thickness_cm=post_thickness_cm,
+        beam_thickness_cm=beam_thickness_cm,
+        railing_height_cm=railing_height_cm,
+        grid_snap_cm=max(0.0, _safe_float(spec.grid_snap_cm, 10.0)),
+        asset_path=str(spec.asset_path or "/Engine/BasicShapes/Cube.Cube"),
+        label_prefix=str(spec.label_prefix or "UCA_Structure"),
         support_surface_kind=str(spec.support_surface_kind or "support_surface"),
         support_level=int(spec.support_level or 0),
         support_actor_label=str(spec.support_actor_label or ""),
@@ -1264,6 +1430,651 @@ def build_house_segments(spec: HouseSpec) -> list[dict[str, Any]]:
 
 def build_house_actions(spec: HouseSpec) -> list[dict[str, Any]]:
     structure_plan = build_house_structure_plan(spec)
+    normalized = structure_plan["spec"]
+    support_hint = {
+        "placement_phase": "initial_place",
+        "snap_policy": "none",
+        "support_reference_policy": normalized.support_reference_policy,
+        "support_surface_kind": normalized.support_surface_kind,
+        "support_level": normalized.support_level,
+        "support_actor_label": normalized.support_actor_label,
+        "parent_support_actor": normalized.parent_support_actor,
+        "surface_anchor": [
+            _snap(normalized.center_x, normalized.grid_snap_cm),
+            _snap(normalized.center_y, normalized.grid_snap_cm),
+            _snap(normalized.support_z, normalized.grid_snap_cm),
+        ],
+        "structure_type": structure_plan.get("structure_type"),
+        "story_count": structure_plan.get("story_count"),
+        "circulation_plan": dict(structure_plan.get("circulation_plan") or {}),
+        "reserved_volumes": list(structure_plan.get("reserved_volumes") or []),
+        "functional_openings": list(structure_plan.get("functional_openings") or []),
+        "roof_envelope": dict(structure_plan.get("roof_envelope") or {}),
+        "landing_requirements": dict(structure_plan.get("landing_requirements") or {}),
+        "clearance_requirements": dict(structure_plan.get("clearance_requirements") or {}),
+    }
+    actions: list[dict[str, Any]] = []
+    for segment in list(structure_plan.get("segments") or []):
+        mount_type = str(segment.get("mount_type") or "wall")
+        segment_hint = {
+            **support_hint,
+            "mount_type": mount_type,
+            "expected_mount_type": mount_type,
+            "structural_role": str(segment.get("structural_role") or ""),
+            "structure_piece_role": str(segment.get("structure_piece_role") or ""),
+            "support_fit_reference_z": segment.get("support_fit_reference_z"),
+            "assembly_zone": normalized.zone_id,
+            "assembly_group": normalized.label_prefix,
+            "reserved_volume_relationship": str(segment.get("reserved_volume_relationship") or "must_not_overlap"),
+            "allowed_reserved_volume_kinds": list(segment.get("allowed_reserved_volume_kinds") or []),
+            "circulation_protected": bool(segment.get("circulation_protected", False)),
+            "opening_protected": bool(segment.get("opening_protected", False)),
+            "structure_story": int(segment.get("structure_story") or 0),
+        }
+        actions.append(
+            {
+                "action": "place_asset",
+                "target_zone": normalized.zone_id,
+                "managed_slot": segment["managed_slot"],
+                "identity_policy": "reuse_or_create",
+                "asset_path": normalized.asset_path,
+                "spawn_label": segment["spawn_label"],
+                "transform": {
+                    "location": list(segment["location"]),
+                    "rotation": list(segment["rotation"]),
+                    "scale": list(segment["scale"]),
+                },
+                "placement_hint": segment_hint,
+            }
+        )
+    return actions
+
+
+def structure_footprint(spec: StructureSpec) -> dict[str, Any]:
+    normalized = normalize_structure_spec(spec)
+    roof_buffer = normalized.roof_overhang_cm if normalized.roof_style in {"gable", "beam"} else 0.0
+    half_width = (normalized.width_cm / 2.0) + roof_buffer
+    half_depth = (normalized.depth_cm / 2.0) + roof_buffer
+    top_z = normalized.support_z + normalized.floor_thickness_cm + normalized.wall_height_cm
+    if normalized.roof_style == "gable":
+        top_z += normalized.roof_rise_cm + normalized.roof_thickness_cm
+    elif normalized.roof_style == "beam":
+        top_z += normalized.beam_thickness_cm
+    return {
+        "center": [normalized.center_x, normalized.center_y, normalized.support_z],
+        "outer_dimensions_cm": [normalized.width_cm, normalized.depth_cm, round(top_z - normalized.support_z, 3)],
+        "min_xy": [round(normalized.center_x - half_width, 3), round(normalized.center_y - half_depth, 3)],
+        "max_xy": [round(normalized.center_x + half_width, 3), round(normalized.center_y + half_depth, 3)],
+        "support_z": normalized.support_z,
+        "top_z": round(top_z, 3),
+    }
+
+
+def plan_structure_spec(
+    spec: StructureSpec,
+    scene_actors: list[dict[str, Any]],
+    *,
+    ignore_actor_paths: set[str] | None = None,
+    ignore_actor_labels: set[str] | None = None,
+    max_rings: int = 10,
+) -> dict[str, Any]:
+    normalized = normalize_structure_spec(spec)
+    footprint = structure_footprint(normalized)
+    grid_step = normalized.grid_snap_cm or max(normalized.wall_thickness_cm, 10.0)
+    tried: list[dict[str, Any]] = []
+    chosen_spec = normalized
+    chosen_conflicts = _structure_candidate_conflicts(
+        min_xy=list(footprint["min_xy"]),
+        max_xy=list(footprint["max_xy"]),
+        support_z=float(footprint["support_z"]),
+        top_z=float(footprint["top_z"]),
+        scene_actors=scene_actors,
+        ignore_actor_paths=ignore_actor_paths,
+        ignore_actor_labels=ignore_actor_labels,
+    )
+    if not chosen_conflicts:
+        return {
+            "spec": chosen_spec,
+            "relocated": False,
+            "offset_cm": [0.0, 0.0],
+            "conflict_count": 0,
+            "blocking_conflicts": [],
+            "tried_positions": [{"center": [normalized.center_x, normalized.center_y], "conflict_count": 0}],
+        }
+    for offset_x, offset_y in _spiral_offsets(grid_step, max_rings):
+        candidate = normalize_structure_spec(
+            StructureSpec(
+                **{
+                    **normalized.__dict__,
+                    "center_x": normalized.center_x + offset_x,
+                    "center_y": normalized.center_y + offset_y,
+                }
+            )
+        )
+        candidate_footprint = structure_footprint(candidate)
+        conflicts = _structure_candidate_conflicts(
+            min_xy=list(candidate_footprint["min_xy"]),
+            max_xy=list(candidate_footprint["max_xy"]),
+            support_z=float(candidate_footprint["support_z"]),
+            top_z=float(candidate_footprint["top_z"]),
+            scene_actors=scene_actors,
+            ignore_actor_paths=ignore_actor_paths,
+            ignore_actor_labels=ignore_actor_labels,
+        )
+        tried.append(
+            {
+                "center": [candidate.center_x, candidate.center_y],
+                "offset_cm": [offset_x, offset_y],
+                "conflict_count": len(conflicts),
+            }
+        )
+        if not conflicts:
+            return {
+                "spec": candidate,
+                "relocated": offset_x != 0.0 or offset_y != 0.0,
+                "offset_cm": [offset_x, offset_y],
+                "conflict_count": 0,
+                "blocking_conflicts": [],
+                "tried_positions": tried,
+            }
+        if len(conflicts) < len(chosen_conflicts):
+            chosen_spec = candidate
+            chosen_conflicts = conflicts
+    return {
+        "spec": chosen_spec,
+        "relocated": chosen_spec.center_x != normalized.center_x or chosen_spec.center_y != normalized.center_y,
+        "offset_cm": [round(chosen_spec.center_x - normalized.center_x, 3), round(chosen_spec.center_y - normalized.center_y, 3)],
+        "conflict_count": len(chosen_conflicts),
+        "blocking_conflicts": chosen_conflicts,
+        "tried_positions": tried,
+    }
+
+
+def _add_gable_roof_segments(
+    segments: list[dict[str, Any]],
+    *,
+    normalized: StructureSpec,
+    roof_base_z: float,
+    footprint_width_cm: float,
+    footprint_depth_cm: float,
+    gable_front_y: float | None,
+    gable_back_y: float | None,
+    story_index: int,
+    include_closures: bool,
+) -> dict[str, Any]:
+    roof_pitch_rad = math.radians(normalized.roof_pitch_deg)
+    half_roof_width = (footprint_width_cm / 2.0) + normalized.roof_overhang_cm
+    roof_depth = footprint_depth_cm + (normalized.roof_overhang_cm * 2.0)
+    roof_panel_width = max(40.0, half_roof_width / max(0.2, math.cos(roof_pitch_rad)))
+    roof_panel_center_z = roof_base_z + (normalized.roof_rise_cm / 2.0)
+    roof_center_x_offset = half_roof_width / 2.0
+    ridge_z = roof_base_z + normalized.roof_rise_cm
+    ridge_center_z = ridge_z + (normalized.roof_ridge_thickness_cm / 2.0)
+    segments.extend(
+        [
+            {
+                "managed_slot": "roof_left",
+                "spawn_label": f"{normalized.label_prefix}_RoofLeft",
+                "location": [round(normalized.center_x - roof_center_x_offset, 3), round(normalized.center_y, 3), round(roof_panel_center_z, 3)],
+                "rotation": [0.0, 0.0, normalized.roof_pitch_deg],
+                "scale": [round(roof_panel_width / CUBE_SIZE_CM, 3), round(roof_depth / CUBE_SIZE_CM, 3), round(normalized.roof_thickness_cm / CUBE_SIZE_CM, 3)],
+                "mount_type": "roof",
+                "structural_role": "roof_panel",
+                "structure_piece_role": "roof_panel",
+                "reserved_volume_relationship": "must_not_overlap",
+                "allowed_reserved_volume_kinds": [],
+                "structure_story": int(story_index),
+                "circulation_protected": True,
+                "opening_protected": True,
+            },
+            {
+                "managed_slot": "roof_right",
+                "spawn_label": f"{normalized.label_prefix}_RoofRight",
+                "location": [round(normalized.center_x + roof_center_x_offset, 3), round(normalized.center_y, 3), round(roof_panel_center_z, 3)],
+                "rotation": [0.0, 0.0, -normalized.roof_pitch_deg],
+                "scale": [round(roof_panel_width / CUBE_SIZE_CM, 3), round(roof_depth / CUBE_SIZE_CM, 3), round(normalized.roof_thickness_cm / CUBE_SIZE_CM, 3)],
+                "mount_type": "roof",
+                "structural_role": "roof_panel",
+                "structure_piece_role": "roof_panel",
+                "reserved_volume_relationship": "must_not_overlap",
+                "allowed_reserved_volume_kinds": [],
+                "structure_story": int(story_index),
+                "circulation_protected": True,
+                "opening_protected": True,
+            },
+            {
+                "managed_slot": "roof_ridge",
+                "spawn_label": f"{normalized.label_prefix}_RoofRidge",
+                "location": [round(normalized.center_x, 3), round(normalized.center_y, 3), round(ridge_center_z, 3)],
+                "rotation": [0.0, 0.0, 0.0],
+                "scale": [
+                    round(normalized.roof_ridge_thickness_cm / CUBE_SIZE_CM, 3),
+                    round(roof_depth / CUBE_SIZE_CM, 3),
+                    round(normalized.roof_ridge_thickness_cm / CUBE_SIZE_CM, 3),
+                ],
+                "mount_type": "roof",
+                "structural_role": "roof_ridge",
+                "structure_piece_role": "roof_ridge",
+                "reserved_volume_relationship": "must_not_overlap",
+                "allowed_reserved_volume_kinds": [],
+                "structure_story": int(story_index),
+                "circulation_protected": True,
+                "opening_protected": True,
+            },
+        ]
+    )
+    if include_closures and gable_front_y is not None and gable_back_y is not None:
+        gable_step_height = normalized.roof_rise_cm / float(normalized.gable_infill_step_count)
+        for side_name, wall_y in (("front", gable_front_y), ("back", gable_back_y)):
+            for step_index in range(normalized.gable_infill_step_count):
+                band_min_z = roof_base_z + (step_index * gable_step_height)
+                band_max_z = roof_base_z + ((step_index + 1) * gable_step_height)
+                band_mid_z = (band_min_z + band_max_z) / 2.0
+                taper_ratio = (band_mid_z - roof_base_z) / max(1.0, normalized.roof_rise_cm)
+                band_width = max(20.0, footprint_width_cm * (1.0 - taper_ratio))
+                segments.append(
+                    _rect_segment(
+                        managed_slot=f"gable_{side_name}_{step_index + 1:02d}",
+                        spawn_label=f"{normalized.label_prefix}_Gable{side_name.title()}_{step_index + 1:02d}",
+                        center_x=normalized.center_x,
+                        center_y=wall_y,
+                        center_z=band_mid_z,
+                        width_cm=band_width,
+                        depth_cm=normalized.wall_thickness_cm,
+                        height_cm=max(10.0, band_max_z - band_min_z),
+                        mount_type="wall",
+                        structural_role="gable_infill",
+                        structure_piece_role="roof_closure",
+                        support_fit_reference_z=band_min_z,
+                        structure_story=int(story_index),
+                        circulation_protected=True,
+                        opening_protected=True,
+                    )
+                )
+    roof_envelope: dict[str, Any] = {
+        "style": "gable",
+        "eave_z": round(roof_base_z, 3),
+        "ridge_z": round(ridge_z, 3),
+        "ridge_x": round(normalized.center_x, 3),
+        "depth_cm": round(roof_depth, 3),
+        "overhang_cm": round(normalized.roof_overhang_cm, 3),
+        "left_panel": {
+            "slot": "roof_left",
+            "expected_location": [round(normalized.center_x - roof_center_x_offset, 3), round(normalized.center_y, 3), round(roof_panel_center_z, 3)],
+            "expected_rotation": [0.0, 0.0, round(normalized.roof_pitch_deg, 3)],
+            "expected_scale": [round(roof_panel_width / CUBE_SIZE_CM, 3), round(roof_depth / CUBE_SIZE_CM, 3), round(normalized.roof_thickness_cm / CUBE_SIZE_CM, 3)],
+        },
+        "right_panel": {
+            "slot": "roof_right",
+            "expected_location": [round(normalized.center_x + roof_center_x_offset, 3), round(normalized.center_y, 3), round(roof_panel_center_z, 3)],
+            "expected_rotation": [0.0, 0.0, round(-normalized.roof_pitch_deg, 3)],
+            "expected_scale": [round(roof_panel_width / CUBE_SIZE_CM, 3), round(roof_depth / CUBE_SIZE_CM, 3), round(normalized.roof_thickness_cm / CUBE_SIZE_CM, 3)],
+        },
+        "ridge": {
+            "slot": "roof_ridge",
+            "expected_location": [round(normalized.center_x, 3), round(normalized.center_y, 3), round(ridge_center_z, 3)],
+        },
+    }
+    if include_closures:
+        roof_envelope["gable_front"] = {"slots": [f"gable_front_{index + 1:02d}" for index in range(normalized.gable_infill_step_count)]}
+        roof_envelope["gable_back"] = {"slots": [f"gable_back_{index + 1:02d}" for index in range(normalized.gable_infill_step_count)]}
+    return roof_envelope
+
+
+def _build_enclosed_structure_plan(spec: StructureSpec) -> dict[str, Any]:
+    normalized = normalize_structure_spec(spec)
+    t = normalized.wall_thickness_cm
+    wall_h = normalized.wall_height_cm
+    floor_t = normalized.floor_thickness_cm
+    inner_w = normalized.width_cm
+    inner_d = normalized.depth_cm
+    outer_w = inner_w + (t * 2.0)
+    outer_d = inner_d + (t * 2.0)
+    floor_z = normalized.support_z + (floor_t / 2.0)
+    wall_center_z = normalized.support_z + floor_t + (wall_h / 2.0)
+    roof_base_z = normalized.support_z + floor_t + wall_h
+    front_y = normalized.center_y - (inner_d / 2.0) - (t / 2.0)
+    back_y = normalized.center_y + (inner_d / 2.0) + (t / 2.0)
+    left_x = normalized.center_x - (inner_w / 2.0) - (t / 2.0)
+    right_x = normalized.center_x + (inner_w / 2.0) + (t / 2.0)
+    horizontal_span = inner_w if normalized.corner_join_style == "butt_join" else outer_w
+    wide_opening_types = {"garage", "barn", "workshop", "warehouse", "hangar"}
+    opening_width = normalized.opening_width_cm if normalized.structure_type in wide_opening_types else normalized.door_width_cm
+    opening_height = normalized.opening_height_cm if normalized.structure_type in wide_opening_types else normalized.door_height_cm
+    front_segment_length = max(20.0, (horizontal_span - opening_width) / 2.0)
+    if normalized.corner_join_style == "butt_join" and normalized.grid_safe_joints and normalized.grid_snap_cm > 0.0:
+        joint_unit = max(normalized.grid_snap_cm, 1.0) * 2.0
+        snapped_segment_length = round(front_segment_length / joint_unit) * joint_unit
+        front_segment_length = max(20.0, min(horizontal_span / 2.0, snapped_segment_length))
+    effective_opening_width = max(80.0, horizontal_span - (front_segment_length * 2.0))
+    front_left_center_x = normalized.center_x - (effective_opening_width / 2.0) - (front_segment_length / 2.0)
+    front_right_center_x = normalized.center_x + (effective_opening_width / 2.0) + (front_segment_length / 2.0)
+    header_height = max(20.0, wall_h - opening_height)
+    header_center_z = normalized.support_z + floor_t + opening_height + (header_height / 2.0)
+
+    segments: list[dict[str, Any]] = [
+        _rect_segment(
+            managed_slot="floor_base",
+            spawn_label=f"{normalized.label_prefix}_FloorBase",
+            center_x=normalized.center_x,
+            center_y=normalized.center_y,
+            center_z=floor_z,
+            width_cm=outer_w,
+            depth_cm=outer_d,
+            height_cm=floor_t,
+            mount_type="floor",
+            structural_role="base_floor",
+            structure_piece_role="floor_slab",
+            support_fit_reference_z=normalized.support_z,
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="wall_back",
+            spawn_label=f"{normalized.label_prefix}_Back",
+            center_x=normalized.center_x,
+            center_y=back_y,
+            center_z=wall_center_z,
+            width_cm=horizontal_span,
+            depth_cm=t,
+            height_cm=wall_h,
+            mount_type="wall",
+            structural_role="wall_base",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="wall_left",
+            spawn_label=f"{normalized.label_prefix}_Left",
+            center_x=left_x,
+            center_y=normalized.center_y,
+            center_z=wall_center_z,
+            width_cm=t,
+            depth_cm=outer_d,
+            height_cm=wall_h,
+            mount_type="wall",
+            structural_role="wall_base",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="wall_right",
+            spawn_label=f"{normalized.label_prefix}_Right",
+            center_x=right_x,
+            center_y=normalized.center_y,
+            center_z=wall_center_z,
+            width_cm=t,
+            depth_cm=outer_d,
+            height_cm=wall_h,
+            mount_type="wall",
+            structural_role="wall_base",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="wall_front_left",
+            spawn_label=f"{normalized.label_prefix}_FrontLeft",
+            center_x=front_left_center_x,
+            center_y=front_y,
+            center_z=wall_center_z,
+            width_cm=front_segment_length,
+            depth_cm=t,
+            height_cm=wall_h,
+            mount_type="wall",
+            structural_role="wall_base",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="wall_front_right",
+            spawn_label=f"{normalized.label_prefix}_FrontRight",
+            center_x=front_right_center_x,
+            center_y=front_y,
+            center_z=wall_center_z,
+            width_cm=front_segment_length,
+            depth_cm=t,
+            height_cm=wall_h,
+            mount_type="wall",
+            structural_role="wall_base",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+        _rect_segment(
+            managed_slot="front_header",
+            spawn_label=f"{normalized.label_prefix}_FrontHeader",
+            center_x=normalized.center_x,
+            center_y=front_y,
+            center_z=header_center_z,
+            width_cm=effective_opening_width,
+            depth_cm=t,
+            height_cm=header_height,
+            mount_type="wall",
+            structural_role="wall_header",
+            structure_piece_role="wall_span",
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        ),
+    ]
+    roof_envelope: dict[str, Any] = {}
+    if normalized.roof_style == "gable":
+        roof_envelope = _add_gable_roof_segments(
+            segments,
+            normalized=normalized,
+            roof_base_z=roof_base_z,
+            footprint_width_cm=outer_w,
+            footprint_depth_cm=outer_d,
+            gable_front_y=front_y,
+            gable_back_y=back_y,
+            story_index=2,
+            include_closures=True,
+        )
+    front_opening = _rect_volume(
+        name="front_entry_opening",
+        kind="door_opening",
+        min_x=normalized.center_x - (effective_opening_width / 2.0),
+        max_x=normalized.center_x + (effective_opening_width / 2.0),
+        min_y=front_y - (t / 2.0),
+        max_y=front_y + (t / 2.0),
+        min_z=normalized.support_z + floor_t,
+        max_z=normalized.support_z + floor_t + opening_height,
+    )
+    return {
+        "structure_type": normalized.structure_type,
+        "story_count": 1,
+        "spec": normalized,
+        "footprint": structure_footprint(normalized),
+        "circulation_plan": {
+            "entry_axis": "front",
+            "entry_width_cm": round(effective_opening_width, 3),
+        },
+        "reserved_volumes": [front_opening],
+        "functional_openings": [front_opening],
+        "roof_envelope": roof_envelope,
+        "landing_requirements": {},
+        "clearance_requirements": {"entry_clear_height_cm": round(opening_height, 3)},
+        "segments": segments,
+    }
+
+
+def _build_open_structure_plan(spec: StructureSpec) -> dict[str, Any]:
+    normalized = normalize_structure_spec(spec)
+    floor_t = normalized.floor_thickness_cm
+    wall_h = normalized.wall_height_cm
+    outer_w = normalized.width_cm + normalized.post_thickness_cm
+    outer_d = normalized.depth_cm + normalized.post_thickness_cm
+    floor_z = normalized.support_z + (floor_t / 2.0)
+    post_height = wall_h
+    post_center_z = normalized.support_z + floor_t + (post_height / 2.0)
+    beam_center_z = normalized.support_z + floor_t + post_height - (normalized.beam_thickness_cm / 2.0)
+    half_span_x = normalized.width_cm / 2.0
+    half_span_y = normalized.depth_cm / 2.0
+    post_x = half_span_x
+    post_y = half_span_y
+    segments: list[dict[str, Any]] = [
+        _rect_segment(
+            managed_slot="floor_base",
+            spawn_label=f"{normalized.label_prefix}_FloorBase",
+            center_x=normalized.center_x,
+            center_y=normalized.center_y,
+            center_z=floor_z,
+            width_cm=outer_w,
+            depth_cm=outer_d,
+            height_cm=floor_t,
+            mount_type="floor",
+            structural_role="base_floor",
+            structure_piece_role="floor_slab",
+            support_fit_reference_z=normalized.support_z,
+            structure_story=1,
+            circulation_protected=True,
+            opening_protected=True,
+        )
+    ]
+    post_positions = [
+        ("post_front_left", -post_x, -post_y),
+        ("post_front_right", post_x, -post_y),
+        ("post_back_left", -post_x, post_y),
+        ("post_back_right", post_x, post_y),
+    ]
+    for slot, dx, dy in post_positions:
+        segments.append(
+            _rect_segment(
+                managed_slot=slot,
+                spawn_label=f"{normalized.label_prefix}_{slot.title().replace('_', '')}",
+                center_x=normalized.center_x + dx,
+                center_y=normalized.center_y + dy,
+                center_z=post_center_z,
+                width_cm=normalized.post_thickness_cm,
+                depth_cm=normalized.post_thickness_cm,
+                height_cm=post_height,
+                mount_type="wall",
+                structural_role="support_post",
+                structure_piece_role="post",
+                support_fit_reference_z=normalized.support_z + floor_t,
+                structure_story=1,
+                circulation_protected=True,
+                opening_protected=True,
+            )
+        )
+    beam_specs = [
+        ("beam_front", normalized.center_x, normalized.center_y - post_y, normalized.width_cm + normalized.post_thickness_cm, normalized.beam_thickness_cm),
+        ("beam_back", normalized.center_x, normalized.center_y + post_y, normalized.width_cm + normalized.post_thickness_cm, normalized.beam_thickness_cm),
+    ]
+    for slot, center_x, center_y, width_cm, depth_cm in beam_specs:
+        segments.append(
+            _rect_segment(
+                managed_slot=slot,
+                spawn_label=f"{normalized.label_prefix}_{slot.title().replace('_', '')}",
+                center_x=center_x,
+                center_y=center_y,
+                center_z=beam_center_z,
+                width_cm=width_cm,
+                depth_cm=depth_cm,
+                height_cm=normalized.beam_thickness_cm,
+                mount_type="wall",
+                structural_role="roof_beam",
+                structure_piece_role="beam",
+                support_fit_reference_z=normalized.support_z + floor_t + post_height - normalized.beam_thickness_cm,
+                structure_story=1,
+                circulation_protected=True,
+                opening_protected=True,
+            )
+        )
+    side_beam_specs = [
+        ("beam_left", normalized.center_x - post_x, normalized.center_y, normalized.beam_thickness_cm, normalized.depth_cm + normalized.post_thickness_cm),
+        ("beam_right", normalized.center_x + post_x, normalized.center_y, normalized.beam_thickness_cm, normalized.depth_cm + normalized.post_thickness_cm),
+    ]
+    for slot, center_x, center_y, width_cm, depth_cm in side_beam_specs:
+        segments.append(
+            _rect_segment(
+                managed_slot=slot,
+                spawn_label=f"{normalized.label_prefix}_{slot.title().replace('_', '')}",
+                center_x=center_x,
+                center_y=center_y,
+                center_z=beam_center_z,
+                width_cm=width_cm,
+                depth_cm=depth_cm,
+                height_cm=normalized.beam_thickness_cm,
+                mount_type="wall",
+                structural_role="roof_beam",
+                structure_piece_role="beam",
+                support_fit_reference_z=normalized.support_z + floor_t + post_height - normalized.beam_thickness_cm,
+                structure_story=1,
+                circulation_protected=True,
+                opening_protected=True,
+            )
+        )
+    roof_envelope: dict[str, Any] = {}
+    if normalized.roof_style == "gable":
+        roof_envelope = _add_gable_roof_segments(
+            segments,
+            normalized=normalized,
+            roof_base_z=normalized.support_z + floor_t + post_height,
+            footprint_width_cm=outer_w,
+            footprint_depth_cm=outer_d,
+            gable_front_y=None,
+            gable_back_y=None,
+            story_index=2,
+            include_closures=False,
+        )
+    else:
+        slat_count = 5 if normalized.structure_type == "pergola" else 3
+        for index in range(slat_count):
+            offset_ratio = 0.0 if slat_count == 1 else (index / float(slat_count - 1)) - 0.5
+            segments.append(
+                _rect_segment(
+                    managed_slot=f"roof_slat_{index + 1:02d}",
+                    spawn_label=f"{normalized.label_prefix}_RoofSlat_{index + 1:02d}",
+                    center_x=normalized.center_x,
+                    center_y=normalized.center_y + (offset_ratio * normalized.depth_cm * 0.85),
+                    center_z=beam_center_z + normalized.beam_thickness_cm,
+                    width_cm=normalized.width_cm + normalized.post_thickness_cm,
+                    depth_cm=max(8.0, normalized.beam_thickness_cm * 0.8),
+                    height_cm=normalized.beam_thickness_cm,
+                    mount_type="roof",
+                    structural_role="roof_slat",
+                    structure_piece_role="roof_panel",
+                    support_fit_reference_z=beam_center_z,
+                    structure_story=2,
+                    circulation_protected=True,
+                    opening_protected=True,
+                )
+            )
+    return {
+        "structure_type": normalized.structure_type,
+        "story_count": 1,
+        "spec": normalized,
+        "footprint": structure_footprint(normalized),
+        "circulation_plan": {"open_sides": True},
+        "reserved_volumes": [],
+        "functional_openings": [],
+        "roof_envelope": roof_envelope,
+        "landing_requirements": {},
+        "clearance_requirements": {},
+        "segments": segments,
+    }
+
+
+def build_structure_plan(spec: StructureSpec) -> dict[str, Any]:
+    normalized = normalize_structure_spec(spec)
+    if normalized.structure_type in ENCLOSED_GENERATIVE_STRUCTURE_TYPES:
+        return _build_enclosed_structure_plan(normalized)
+    return _build_open_structure_plan(normalized)
+
+
+def build_structure_actions(spec: StructureSpec) -> list[dict[str, Any]]:
+    structure_plan = build_structure_plan(spec)
     normalized = structure_plan["spec"]
     support_hint = {
         "placement_phase": "initial_place",

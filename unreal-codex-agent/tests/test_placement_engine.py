@@ -7,8 +7,8 @@ from apps.integrations.uefn_backend import backend_settings
 from apps.orchestrator.dirty_zone import DirtyZone
 from apps.mcp_extensions.scene_tools import enrich_scene_state
 from apps.mcp_extensions.uefn_tools import _stray_tool_generated_paths_for_zone
-from apps.placement.assembly_builder import BoxRoomSpec, HouseSpec, build_box_room_actions, build_box_room_segments
-from apps.placement.assembly_builder import build_house_actions, build_house_segments, build_house_structure_plan, plan_box_room_spec, plan_house_spec
+from apps.placement.assembly_builder import BoxRoomSpec, HouseSpec, StructureSpec, build_box_room_actions, build_box_room_segments
+from apps.placement.assembly_builder import build_house_actions, build_house_segments, build_house_structure_plan, build_structure_actions, build_structure_plan, plan_box_room_spec, plan_house_spec, plan_structure_spec
 from apps.placement.interference import detect_actor_conflicts, find_non_interfering_location
 from apps.placement.managed_registry import registry_layout_snapshot, upsert_slot_record
 from apps.placement.placement_solver import normalize_action_payload
@@ -1023,6 +1023,168 @@ def test_house_actions_include_mount_types_for_structural_segments():
     assert action_by_slot["floor_ground"]["placement_hint"]["mount_type"] == "floor"
     assert action_by_slot["story1_wall_back"]["placement_hint"]["mount_type"] == "wall"
     assert action_by_slot["roof_left"]["placement_hint"]["mount_type"] == "roof"
+
+
+def test_structure_planner_relocates_generic_structure_when_requested_footprint_is_occupied(tmp_path: Path):
+    spec = StructureSpec(
+        zone_id="zone_garage",
+        structure_type="garage",
+        center_x=0.0,
+        center_y=0.0,
+        support_z=0.0,
+        width_cm=800.0,
+        depth_cm=720.0,
+    )
+    scene_actors = [
+        make_actor(
+            label="ExistingWorkshop",
+            class_name="StaticMeshActor",
+            location=[480.0, 0.0, 150.0],
+            extent=[80.0, 140.0, 180.0],
+            asset_path="/Game/Environment/ExistingWorkshop",
+        )
+    ]
+
+    plan = plan_structure_spec(spec, scene_actors)
+
+    assert plan["relocated"] is True
+    assert plan["conflict_count"] == 0
+    assert plan["spec"].center_x != 0.0 or plan["spec"].center_y != 0.0
+
+
+def test_garage_structure_plan_builds_enclosed_shell_with_opening_and_roof():
+    structure_plan = build_structure_plan(
+        StructureSpec(
+            zone_id="zone_garage",
+            structure_type="garage",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            width_cm=820.0,
+            depth_cm=760.0,
+            label_prefix="UCA_Garage",
+        )
+    )
+
+    segments = list(structure_plan.get("segments") or [])
+    by_slot = {segment["managed_slot"]: segment for segment in segments}
+
+    assert structure_plan["structure_type"] == "garage"
+    assert "floor_base" in by_slot
+    assert "wall_front_left" in by_slot
+    assert "wall_front_right" in by_slot
+    assert "front_header" in by_slot
+    assert "roof_left" in by_slot
+    assert "roof_right" in by_slot
+    assert "roof_ridge" in by_slot
+    assert any(volume["name"] == "front_entry_opening" for volume in list(structure_plan.get("reserved_volumes") or []))
+
+
+def test_warehouse_structure_plan_builds_large_enclosed_shell_with_wide_opening():
+    structure_plan = build_structure_plan(
+        StructureSpec(
+            zone_id="zone_warehouse",
+            structure_type="warehouse",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            width_cm=1320.0,
+            depth_cm=980.0,
+            opening_width_cm=420.0,
+            opening_height_cm=300.0,
+            label_prefix="UCA_Warehouse",
+        )
+    )
+
+    segments = list(structure_plan.get("segments") or [])
+    by_slot = {segment["managed_slot"]: segment for segment in segments}
+
+    assert structure_plan["structure_type"] == "warehouse"
+    assert "wall_front_left" in by_slot
+    assert "wall_front_right" in by_slot
+    assert "front_header" in by_slot
+    assert "roof_left" in by_slot
+    assert "roof_right" in by_slot
+    assert by_slot["wall_front_left"]["scale"][0] < 4.7
+    assert by_slot["wall_front_right"]["scale"][0] < 4.7
+    assert any(volume["name"] == "front_entry_opening" for volume in list(structure_plan.get("reserved_volumes") or []))
+
+
+def test_pavilion_structure_plan_builds_open_post_and_roof_layout():
+    structure_plan = build_structure_plan(
+        StructureSpec(
+            zone_id="zone_pavilion",
+            structure_type="pavilion",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            width_cm=900.0,
+            depth_cm=720.0,
+            label_prefix="UCA_Pavilion",
+        )
+    )
+
+    segments = list(structure_plan.get("segments") or [])
+    by_slot = {segment["managed_slot"]: segment for segment in segments}
+
+    assert structure_plan["structure_type"] == "pavilion"
+    assert structure_plan["reserved_volumes"] == []
+    assert "post_front_left" in by_slot
+    assert "post_front_right" in by_slot
+    assert "post_back_left" in by_slot
+    assert "post_back_right" in by_slot
+    assert "beam_front" in by_slot
+    assert "beam_back" in by_slot
+    assert "roof_left" in by_slot
+    assert "roof_right" in by_slot
+    assert "roof_ridge" in by_slot
+
+
+def test_canopy_structure_plan_builds_open_support_layout_with_posts_and_roof():
+    structure_plan = build_structure_plan(
+        StructureSpec(
+            zone_id="zone_canopy",
+            structure_type="canopy",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            width_cm=860.0,
+            depth_cm=620.0,
+            label_prefix="UCA_Canopy",
+        )
+    )
+
+    segments = list(structure_plan.get("segments") or [])
+    by_slot = {segment["managed_slot"]: segment for segment in segments}
+
+    assert structure_plan["structure_type"] == "canopy"
+    assert structure_plan["reserved_volumes"] == []
+    assert "post_front_left" in by_slot
+    assert "post_front_right" in by_slot
+    assert "beam_front" in by_slot
+    assert "beam_back" in by_slot
+    assert "roof_left" in by_slot
+    assert "roof_right" in by_slot
+    assert "roof_ridge" in by_slot
+
+
+def test_structure_actions_share_managed_contract():
+    actions = build_structure_actions(
+        StructureSpec(
+            zone_id="zone_workshop",
+            structure_type="workshop",
+            center_x=0.0,
+            center_y=0.0,
+            support_z=0.0,
+            label_prefix="UCA_Workshop",
+        )
+    )
+    action_by_slot = {action["managed_slot"]: action for action in actions}
+
+    assert action_by_slot["floor_base"]["identity_policy"] == "reuse_or_create"
+    assert action_by_slot["floor_base"]["placement_hint"]["structure_type"] == "workshop"
+    assert action_by_slot["roof_left"]["placement_hint"]["mount_type"] == "roof"
+    assert action_by_slot["wall_front_left"]["placement_hint"]["mount_type"] == "wall"
 
 
 def test_publish_safe_export_keeps_managed_action_contract(tmp_path: Path):

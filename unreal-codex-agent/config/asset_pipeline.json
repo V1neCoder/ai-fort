@@ -1,0 +1,36 @@
+{
+  "generation": {
+    "ai_provider": "auto",
+    "preferred_providers": ["gemini", "groq", "cerebras"],
+    "max_correction_attempts": 3,
+    "default_scale_cm": true,
+    "target_polycount": 30000,
+    "mesh_engine": "manifold"
+  },
+  "validation": {
+    "vision_provider": "gemini",
+    "pass_threshold": 0.65,
+    "screenshot_count": 8,
+    "screenshot_resolution": [800, 600]
+  },
+  "storage": {
+    "root": "data/ai_assets",
+    "max_versions": 5
+  },
+  "uefn_import": {
+    "enabled": true,
+    "auto_import_on_approve": false,
+    "mcp_host": "127.0.0.1",
+    "mcp_port": 8765,
+    "category_paths": {
+      "furniture": "/Game/Generated/Props/Furniture/",
+      "architecture": "/Game/Generated/Buildings/",
+      "terrain": "/Game/Generated/Terrain/",
+      "prop": "/Game/Generated/Props/",
+      "vegetation": "/Game/Generated/Foliage/",
+      "vehicle": "/Game/Generated/Vehicles/",
+      "decor": "/Game/Generated/Props/Decor/",
+      "structural": "/Game/Generated/Buildings/Structural/"
+    }
+  }
+}

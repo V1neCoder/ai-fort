@@ -81,6 +81,7 @@ ignore = [
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-q"
+norecursedirs = ["tests/fixtures/tmp*"]
 
 [tool.mypy]
 python_version = "3.11"

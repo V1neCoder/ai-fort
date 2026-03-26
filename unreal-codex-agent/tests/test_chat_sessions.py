@@ -1066,6 +1066,7 @@ class ChatEndpointTests(unittest.TestCase):
             return FakeResponse()
 
         with patch.object(server, "_resolve_llm_request_target", return_value=(object(), "groq", "llama-3.3-70b-versatile")), \
+             patch.object(server, "_maybe_execute_direct_action", return_value=None), \
              patch.object(server, "_chat_completion_with_retry", side_effect=fake_completion), \
              patch.object(server, "_track_usage", return_value=None), \
              patch.object(server, "discover_uefn_listener_port", return_value=8765), \
@@ -1084,6 +1085,45 @@ class ChatEndpointTests(unittest.TestCase):
             )
 
         self.assertEqual(captured["tool_choice"], "auto")
+
+    def test_ai_chat_structure_requests_force_required_tool_choice_and_tool_routing(self):
+        captured = {}
+
+        class FakeResponse:
+            usage = None
+
+            class Choice:
+                class Message:
+                    content = "I will build the structure with the shared planner."
+                    tool_calls = []
+
+                message = Message()
+
+            choices = [Choice()]
+
+        def fake_completion(client, provider, *, model, messages, tools=None, tool_choice=None, **kwargs):
+            captured["tool_choice"] = tool_choice
+            captured["messages"] = messages
+            return FakeResponse()
+
+        with patch.object(server, "_resolve_llm_request_target", return_value=(object(), "groq", "llama-3.3-70b-versatile")), \
+             patch.object(server, "_maybe_execute_direct_action", return_value=None), \
+             patch.object(server, "_chat_completion_with_retry", side_effect=fake_completion), \
+             patch.object(server, "_track_usage", return_value=None), \
+             patch.object(server, "discover_uefn_listener_port", return_value=8765), \
+             patch.object(server, "_get_uefn_context", return_value={"connected": True, "selected_actors": [], "level": {}}), \
+             patch.object(server, "_chat_uefn_query", return_value={"success": False}):
+            server._ai_chat(
+                "build me a wide industrial warehouse with a steep roof",
+                [],
+                [],
+            )
+
+        self.assertEqual(captured["tool_choice"], "required")
+        system_prompt = "\n".join(str(message.get("content") or "") for message in captured["messages"] if message.get("role") == "system")
+        self.assertIn("TOOL ROUTING GUIDANCE:", system_prompt)
+        self.assertIn("build_structure_action", system_prompt)
+        self.assertIn('structure="warehouse"', system_prompt)
 
     def test_handle_tool_call_blocks_unsafe_broad_python_mutation(self):
         result = server._handle_tool_call("execute_python_in_uefn", {
@@ -1475,11 +1515,64 @@ class ChatEndpointTests(unittest.TestCase):
             overview = server._get_project_overview()
         action_ids = {item["id"] for item in overview["server_actions"]}
 
+        self.assertIn("build_house_action", function_names)
+        self.assertIn("build_structure_action", function_names)
         self.assertIn("terrain_action", function_names)
         self.assertIn("import_attached_models", function_names)
+        self.assertIn("build_house_action", action_ids)
+        self.assertIn("build_structure_action", action_ids)
         self.assertIn("apply_material_action", function_names)
         self.assertIn("terrain_action", action_ids)
         self.assertIn("import_attached_models", action_ids)
+
+    def test_handle_tool_call_can_execute_build_house_action(self):
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built house"}) as fake_build_house:
+            result = server._handle_tool_call("build_house_action", {
+                "request": "build a modern house here",
+                "style": "modern",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built house")
+        fake_build_house.assert_called_once()
+
+    def test_handle_tool_call_can_execute_build_structure_action(self):
+        with patch.object(server, "_execute_build_structure_request", return_value={"success": True, "summary": "built pavilion"}) as fake_build_structure:
+            result = server._handle_tool_call("build_structure_action", {
+                "request": "build a garden pavilion here",
+                "structure": "pavilion",
+                "style": "garden",
+            })
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["summary"], "built pavilion")
+        fake_build_structure.assert_called_once()
+
+    def test_generate_structure_spec_supports_expanded_families_and_modifiers(self):
+        spec, variation = server._generate_structure_spec_from_request(
+            {
+                "structure": "warehouse",
+                "size": "large",
+            },
+            message="build a wide industrial warehouse with a steep roof",
+            chat_id="chat-warehouse",
+            support_context={
+                "center_x": 1200.0,
+                "center_y": 2400.0,
+                "support_z": 0.0,
+                "support_surface_kind": "support_surface",
+                "support_level": 0,
+                "support_actor_label": "GridPlane4",
+            },
+        )
+
+        self.assertEqual(spec.structure_type, "warehouse")
+        self.assertEqual(spec.label_prefix, "UCA_Warehouse")
+        self.assertEqual(variation["style"], "industrial")
+        self.assertGreater(spec.width_cm, 1400.0)
+        self.assertGreater(spec.roof_pitch_deg, 15.0)
+        self.assertEqual(variation["body_material"], "metal")
+        self.assertEqual(variation["roof_material"], "metal")
 
     def test_handle_tool_call_can_execute_terrain_action(self):
         with patch.object(server, "_execute_terrain_control", return_value={"success": True, "summary": "created terrain"}) as fake_terrain:
@@ -1521,6 +1614,73 @@ class ChatEndpointTests(unittest.TestCase):
 
 
 class ModelImportExecutionTests(unittest.TestCase):
+    def test_execute_action_blocks_supports_build_house(self):
+        reply = """I am building the house now.
+```action
+{"action": "build_house", "request": "build a cozy house here", "style": "cottage"}
+```"""
+
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "result": {"zone_id": "zone_house_test"}}) as fake_build_house:
+            results = server._execute_action_blocks(reply)
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["action"], "build_house")
+        self.assertTrue(results[0]["success"])
+        fake_build_house.assert_called_once()
+
+    def test_generative_build_delegates_house_requests_to_shared_house_executor(self):
+        with patch.object(server, "_execute_build_house", return_value={"success": True, "summary": "built via shared planner"}) as fake_build_house, \
+             patch.object(server, "discover_uefn_listener_port", return_value=8765):
+            result = server._execute_generative_build({
+                "structure": "house",
+                "position": {"x": 4000, "y": 4200, "z": 0},
+                "size": "medium",
+                "material": "brick",
+            })
+
+        self.assertTrue(result["success"])
+        fake_build_house.assert_called_once()
+        delegated_action = fake_build_house.call_args.args[0]
+        self.assertEqual(delegated_action["position"]["x"], 4000)
+        self.assertEqual(delegated_action["material"], "brick")
+
+    def test_generative_build_delegates_planned_structure_requests_to_shared_structure_executor(self):
+        with patch.object(server, "_execute_build_structure_request", return_value={"success": True, "summary": "built shared pavilion"}) as fake_build_structure, \
+             patch.object(server, "discover_uefn_listener_port", return_value=8765):
+            result = server._execute_generative_build({
+                "structure": "pavilion",
+                "position": {"x": 4100, "y": 4150, "z": 0},
+                "size": "large",
+                "material": "wood",
+            })
+
+        self.assertTrue(result["success"])
+        fake_build_structure.assert_called_once()
+        delegated_action = fake_build_structure.call_args.args[0]
+        self.assertEqual(delegated_action["position"]["x"], 4100)
+        self.assertEqual(delegated_action["structure"], "pavilion")
+        self.assertEqual(delegated_action["material"], "wood")
+
+    def test_direct_action_shortcuts_explicit_structure_build_requests(self):
+        with patch.object(server, "_maybe_import_and_place_model_attachments", return_value=None), \
+             patch.object(server, "_execute_build_structure_request", return_value={"success": True, "summary": "built direct gazebo"}) as fake_build_structure:
+            result = server._maybe_execute_direct_action("build me a gazebo here")
+
+        self.assertTrue(result["success"])
+        fake_build_structure.assert_called_once()
+        delegated_action = fake_build_structure.call_args.args[0]
+        self.assertEqual(delegated_action["structure"], "gazebo")
+
+    def test_system_prompt_includes_shared_house_generation_grounding(self):
+        prompt = server._build_system_prompt(chat_title="House Chat", chat_memory="User likes varied houses.")
+        self.assertIn("build_house_action", prompt)
+        self.assertIn("build_structure_action", prompt)
+        self.assertIn("House Generation Grounding", prompt)
+        self.assertIn("Structure Generation Grounding", prompt)
+        self.assertIn("Tool Execution Grounding", prompt)
+        self.assertIn("Do not generate the exact same house every time.", prompt)
+        self.assertIn("Use shared geometry planners and managed actions for structures whenever possible.", prompt)
+
     def test_generative_build_supports_waterfall_structure(self):
         captured = {}
 
