@@ -61,6 +61,122 @@
       "bounds_cm": {}
     },
     {
+      "asset_id": "b7b68aa02481",
+      "name": "modern_house_002",
+      "category": "architecture",
+      "project": "default",
+      "prompt": "create a  modern house",
+      "spec": {
+        "prompt": "create a  modern house",
+        "asset_name": "modern_house",
+        "category": "architecture",
+        "purpose": "residential building",
+        "required_components": [
+          "walls",
+          "roof",
+          "doors",
+          "windows"
+        ],
+        "expected_silhouette": "rectangular with flat or slightly sloping roof",
+        "scale_range_cm": {
+          "min_width": 600,
+          "max_width": 1200,
+          "min_height": 300,
+          "max_height": 600,
+          "min_depth": 400,
+          "max_depth": 1000
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "too small",
+          "incorrect proportions",
+          "lacking modern features"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FFFFFF",
+          "#808080",
+          "#454545"
+        ]
+      },
+      "version": 1,
+      "status": "generating",
+      "created_at": "2026-03-26T05:49:28.160632+00:00",
+      "updated_at": "2026-03-26T05:49:28.162602+00:00",
+      "glb_path": "",
+      "preview_screenshots": [],
+      "generated_code": "",
+      "validation_results": [],
+      "fix_history": [],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "",
+      "vertex_count": 0,
+      "face_count": 0,
+      "bounds_cm": {}
+    },
+    {
+      "asset_id": "dd9202125b44",
+      "name": "modern_house_003",
+      "category": "architecture",
+      "project": "default",
+      "prompt": "create a modern house",
+      "spec": {
+        "prompt": "create a modern house",
+        "asset_name": "modern_house",
+        "category": "architecture",
+        "purpose": "residential building",
+        "required_components": [
+          "walls",
+          "roof",
+          "doors",
+          "windows"
+        ],
+        "expected_silhouette": "rectangular with sloping roof",
+        "scale_range_cm": {
+          "min_width": 600,
+          "max_width": 1200,
+          "min_height": 300,
+          "max_height": 600,
+          "min_depth": 400,
+          "max_depth": 800
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "too small",
+          "no windows",
+          "no doors"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FFFFFF",
+          "#808080",
+          "#454545"
+        ]
+      },
+      "version": 1,
+      "status": "approved",
+      "created_at": "2026-03-26T05:51:19.620365+00:00",
+      "updated_at": "2026-03-26T05:53:00.641748+00:00",
+      "glb_path": "",
+      "preview_screenshots": [],
+      "generated_code": "",
+      "validation_results": [],
+      "fix_history": [],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "",
+      "vertex_count": 0,
+      "face_count": 0,
+      "bounds_cm": {}
+    },
+    {
       "asset_id": "1bc6fcc7432a",
       "name": "modern_house_004",
       "category": "architecture",
@@ -180,6 +296,82 @@
       "bounds_cm": {}
     },
     {
+      "asset_id": "df56666cc9e3",
+      "name": "modern_house_006",
+      "category": "architecture",
+      "project": "default",
+      "prompt": "CREATE  A MODERN HOUSE",
+      "spec": {
+        "prompt": "CREATE  A MODERN HOUSE",
+        "asset_name": "modern_house",
+        "category": "architecture",
+        "purpose": "residential dwelling",
+        "required_components": [
+          "walls",
+          "roof",
+          "doors",
+          "windows",
+          "foundation"
+        ],
+        "expected_silhouette": "rectangular with sloping roof",
+        "scale_range_cm": {
+          "min_width": 600,
+          "max_width": 1200,
+          "min_height": 400,
+          "max_height": 700,
+          "min_depth": 400,
+          "max_depth": 800
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "incorrect proportions",
+          "missing essential components",
+          "inconsistent style"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FFFFFF",
+          "#808080",
+          "#454545",
+          "#66CCCC"
+        ]
+      },
+      "version": 4,
+      "status": "build_failed",
+      "created_at": "2026-03-26T05:59:00.544324+00:00",
+      "updated_at": "2026-03-26T05:59:09.373841+00:00",
+      "glb_path": "",
+      "preview_screenshots": [],
+      "generated_code": "",
+      "validation_results": [],
+      "fix_history": [
+        {
+          "attempt": 1,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 2,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 3,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        }
+      ],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "",
+      "vertex_count": 0,
+      "face_count": 0,
+      "bounds_cm": {}
+    },
+    {
       "asset_id": "ff0762c5bd19",
       "name": "modern_house_007",
       "category": "architecture",
@@ -218,10 +410,10 @@
           "#454545"
         ]
       },
-      "version": 2,
-      "status": "generating",
+      "version": 4,
+      "status": "build_failed",
       "created_at": "2026-03-26T06:07:11.584068+00:00",
-      "updated_at": "2026-03-26T06:07:13.812177+00:00",
+      "updated_at": "2026-03-26T06:07:17.648018+00:00",
       "glb_path": "",
       "preview_screenshots": [],
       "generated_code": "",
@@ -229,6 +421,91 @@
       "fix_history": [
         {
           "attempt": 1,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 2,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 3,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        }
+      ],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "",
+      "vertex_count": 0,
+      "face_count": 0,
+      "bounds_cm": {}
+    },
+    {
+      "asset_id": "4d2e0911272b",
+      "name": "modern_house_008",
+      "category": "architecture",
+      "project": "default",
+      "prompt": "Create a  modern house",
+      "spec": {
+        "prompt": "Create a  modern house",
+        "asset_name": "modern_house",
+        "category": "architecture",
+        "purpose": "residential building",
+        "required_components": [
+          "walls",
+          "roof",
+          "doors",
+          "windows"
+        ],
+        "expected_silhouette": "rectangular with flat or sloping roof",
+        "scale_range_cm": {
+          "min_width": 600,
+          "max_width": 1200,
+          "min_height": 300,
+          "max_height": 800,
+          "min_depth": 400,
+          "max_depth": 1000
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "too small",
+          "too simplistic",
+          "lacking modern features"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FFFFFF",
+          "#808080",
+          "#454545",
+          "#66CCCC"
+        ]
+      },
+      "version": 4,
+      "status": "build_failed",
+      "created_at": "2026-03-26T06:10:32.654036+00:00",
+      "updated_at": "2026-03-26T06:10:38.280241+00:00",
+      "glb_path": "",
+      "preview_screenshots": [],
+      "generated_code": "",
+      "validation_results": [],
+      "fix_history": [
+        {
+          "attempt": 1,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 2,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 3,
           "action": "build_failed",
           "error": "Code execution failed: __import__ not found"
         }

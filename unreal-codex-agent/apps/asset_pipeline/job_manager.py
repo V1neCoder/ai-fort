@@ -56,10 +56,10 @@ class Job:
 class JobManager:
     """Thread-safe async job manager for the asset pipeline."""
 
-    def __init__(self):
+    def __init__(self, pipeline=None):
         self._lock = threading.Lock()
         self._jobs: dict[str, Job] = {}
-        self._pipeline = None
+        self._pipeline = pipeline
 
     def _get_pipeline(self):
         if self._pipeline is None:

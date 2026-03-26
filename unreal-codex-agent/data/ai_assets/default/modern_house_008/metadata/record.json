@@ -1,11 +1,11 @@
 {
-  "asset_id": "1bc6fcc7432a",
-  "name": "modern_house_004",
+  "asset_id": "4d2e0911272b",
+  "name": "modern_house_008",
   "category": "architecture",
   "project": "default",
-  "prompt": "create  a  modern  house",
+  "prompt": "Create a  modern house",
   "spec": {
-    "prompt": "create  a  modern  house",
+    "prompt": "Create a  modern house",
     "asset_name": "modern_house",
     "category": "architecture",
     "purpose": "residential building",
@@ -13,24 +13,22 @@
       "walls",
       "roof",
       "doors",
-      "windows",
-      "foundation"
+      "windows"
     ],
-    "expected_silhouette": "rectangular with sloping roof",
+    "expected_silhouette": "rectangular with flat or sloping roof",
     "scale_range_cm": {
       "min_width": 600,
       "max_width": 1200,
       "min_height": 300,
-      "max_height": 600,
+      "max_height": 800,
       "min_depth": 400,
-      "max_depth": 800
+      "max_depth": 1000
     },
     "interior_required": true,
     "failure_conditions": [
       "too small",
-      "no windows",
-      "no doors",
-      "unrealistic proportions"
+      "too simplistic",
+      "lacking modern features"
     ],
     "style": "modern",
     "color_palette": [
@@ -40,15 +38,31 @@
       "#66CCCC"
     ]
   },
-  "version": 1,
-  "status": "generating",
-  "created_at": "2026-03-26T05:52:51.920056+00:00",
-  "updated_at": "2026-03-26T05:52:51.922454+00:00",
+  "version": 4,
+  "status": "build_failed",
+  "created_at": "2026-03-26T06:10:32.654036+00:00",
+  "updated_at": "2026-03-26T06:10:38.280241+00:00",
   "glb_path": "",
   "preview_screenshots": [],
   "generated_code": "",
   "validation_results": [],
-  "fix_history": [],
+  "fix_history": [
+    {
+      "attempt": 1,
+      "action": "build_failed",
+      "error": "Code execution failed: __import__ not found"
+    },
+    {
+      "attempt": 2,
+      "action": "build_failed",
+      "error": "Code execution failed: __import__ not found"
+    },
+    {
+      "attempt": 3,
+      "action": "build_failed",
+      "error": "Code execution failed: __import__ not found"
+    }
+  ],
   "latest_validation": {},
   "uefn_import_path": "",
   "imported_at": "",

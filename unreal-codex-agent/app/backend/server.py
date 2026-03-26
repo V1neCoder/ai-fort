@@ -15764,7 +15764,7 @@ def _get_job_manager():
         if str(WORKSPACE_ROOT) not in sys.path:
             sys.path.insert(0, str(WORKSPACE_ROOT))
         from apps.asset_pipeline.job_manager import JobManager
-        _job_manager_instance = JobManager()
+        _job_manager_instance = JobManager(pipeline=_get_pipeline())
     return _job_manager_instance
 
 
