@@ -3,6 +3,7 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const http = require('http');
 const net = require('net');
+const os = require('os');
 const path = require('path');
 
 const FRONTEND_URL = process.env.ELECTRON_FRONTEND_URL || 'http://localhost:3000';
@@ -12,6 +13,9 @@ const BACKEND_ENTRY = path.join(WORKSPACE_ROOT, 'app', 'backend', 'server.py');
 const BACKEND_HOST = '127.0.0.1';
 const BACKEND_PORT_START = 8000;
 const BACKEND_PORT_END = 8035;
+const ELECTRON_STATE_ROOT = path.join(WORKSPACE_ROOT, 'data', 'electron_runtime');
+const ELECTRON_CACHE_DIR = path.join(ELECTRON_STATE_ROOT, 'cache');
+const ELECTRON_USER_DATA_DIR = path.join(ELECTRON_STATE_ROOT, 'userData');
 
 let mainWindow = null;
 let backendProcess = null;
@@ -19,6 +23,28 @@ let backendUrl = '';
 let backendPromise = null;
 let lastBackendFailure = '';
 const backendLogTail = [];
+
+function ensureElectronPaths() {
+    for (const target of [ELECTRON_STATE_ROOT, ELECTRON_CACHE_DIR, ELECTRON_USER_DATA_DIR]) {
+        try {
+            fs.mkdirSync(target, { recursive: true });
+        } catch {
+            // Fall back below if a workspace path is not writable.
+        }
+    }
+
+    const fallbackRoot = path.join(os.tmpdir(), 'uefn-codex-agent-electron');
+    const cacheDir = fs.existsSync(ELECTRON_CACHE_DIR) ? ELECTRON_CACHE_DIR : path.join(fallbackRoot, 'cache');
+    const userDataDir = fs.existsSync(ELECTRON_USER_DATA_DIR) ? ELECTRON_USER_DATA_DIR : path.join(fallbackRoot, 'userData');
+
+    try {
+        fs.mkdirSync(cacheDir, { recursive: true });
+        app.setPath('sessionData', cacheDir);
+        app.setPath('userData', userDataDir);
+    } catch {
+        // If even temp fails, Electron will fall back to its defaults.
+    }
+}
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -322,6 +348,8 @@ ipcMain.handle('backend:get-app-info', async () => ({
     electronVersion: process.versions.electron,
     chromeVersion: process.versions.chrome,
 }));
+
+ensureElectronPaths();
 
 app.whenReady().then(() => {
     createWindow();

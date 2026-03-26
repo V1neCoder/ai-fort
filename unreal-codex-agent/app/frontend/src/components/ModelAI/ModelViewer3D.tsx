@@ -210,7 +210,7 @@ export default function ModelViewer3D({
             gl={{ preserveDrawingBuffer: true, antialias: true }}
             onCreated={({ gl }) => {
                 gl.outputColorSpace = THREE.SRGBColorSpace;
-                gl.toneMapping = THREE.NeutralToneMapping;
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
             }}
             style={{ background: '#0a0a15' }}
         >
