@@ -6,8 +6,8 @@
     "category": "architecture",
     "description": "create a modern house",
     "tags": [
-      "modern",
       "architecture",
+      "modern",
       "ai-generated"
     ],
     "dimensions": {},
@@ -17,6 +17,42 @@
     "viewer_note": "AI Generated v1 — approved",
     "pipeline_asset": true,
     "pipeline_id": "dd9202125b44",
+    "pipeline_status": "approved"
+  },
+  {
+    "id": "b32bac3b1904",
+    "name": "Wooden Crate 003",
+    "type": "prop",
+    "category": "prop",
+    "description": "create a  crate",
+    "tags": [
+      "prop",
+      "rustic",
+      "ai-generated"
+    ],
+    "dimensions": {
+      "min": [
+        -30.0,
+        -40.0,
+        0.0
+      ],
+      "max": [
+        30.0,
+        40.0,
+        50.0
+      ],
+      "size": [
+        60.0,
+        80.0,
+        50.0
+      ]
+    },
+    "trust_score": 0.5,
+    "composite_asset": false,
+    "viewer_model_url": "/ai_assets/default/wooden_crate_003/exports/wooden_crate_003_v1.glb",
+    "viewer_note": "AI Generated v1 — approved",
+    "pipeline_asset": true,
+    "pipeline_id": "b32bac3b1904",
     "pipeline_status": "approved"
   }
 ]

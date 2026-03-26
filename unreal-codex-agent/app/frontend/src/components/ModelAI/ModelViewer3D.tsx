@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useEffect, useState } from 'react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, Grid, useGLTF, Html } from '@react-three/drei';
+import React, { useRef, useMemo, useEffect, useState, Component, ErrorInfo, ReactNode } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
+import { OrbitControls, Grid, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 export type ViewMode = 'solid' | 'wireframe' | 'normals' | 'matcap' | 'uv';
@@ -12,6 +12,35 @@ interface ModelViewer3DProps {
     onMeshStats?: (stats: { vertices: number; triangles: number; bounds: number[] }) => void;
     onScreenshot?: () => void;
     screenshotTrigger?: number;
+}
+
+/** Error boundary to catch WebGL failures gracefully */
+class WebGLErrorBoundary extends Component<{ children: ReactNode; fallbackUrl?: string }, { hasError: boolean }> {
+    state = { hasError: false };
+    static getDerivedStateFromError() { return { hasError: true }; }
+    componentDidCatch(error: Error, info: ErrorInfo) {
+        console.warn('WebGL error caught:', error.message);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#888', gap: 12 }}>
+                    <p style={{ margin: 0 }}>3D viewer unavailable (WebGL context limit).</p>
+                    <p style={{ margin: 0, fontSize: 12, color: '#666' }}>Close other tabs or 3D viewers to free up resources.</p>
+                    {this.props.fallbackUrl && (
+                        // @ts-ignore
+                        <model-viewer
+                            src={this.props.fallbackUrl}
+                            alt="3D model"
+                            auto-rotate camera-controls
+                            style={{ width: '100%', height: '300px', backgroundColor: '#0a0a15' }}
+                        />
+                    )}
+                </div>
+            );
+        }
+        return this.props.children;
+    }
 }
 
 /** Matcap texture generated procedurally */
@@ -50,7 +79,6 @@ function useUVCheckerTexture(): THREE.Texture {
                 ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
             }
         }
-        // Grid lines
         ctx.strokeStyle = '#60607080';
         ctx.lineWidth = 1;
         for (let i = 0; i <= 16; i++) {
@@ -77,7 +105,6 @@ function Model({ url, viewMode, onStats }: {
     const matcapTex = useMatcapTexture();
     const uvTex = useUVCheckerTexture();
 
-    // Center and ground the model
     useEffect(() => {
         if (!groupRef.current) return;
         const box = new THREE.Box3().setFromObject(groupRef.current);
@@ -100,7 +127,6 @@ function Model({ url, viewMode, onStats }: {
         }
     }, [scene, onStats]);
 
-    // Apply view mode materials
     useEffect(() => {
         if (!groupRef.current) return;
 
@@ -108,7 +134,6 @@ function Model({ url, viewMode, onStats }: {
             if (!(child as THREE.Mesh).isMesh) return;
             const mesh = child as THREE.Mesh;
 
-            // Store original material
             if (!(mesh.userData as any)._origMat) {
                 (mesh.userData as any)._origMat = mesh.material;
             }
@@ -143,7 +168,6 @@ function Model({ url, viewMode, onStats }: {
         });
 
         return () => {
-            // Restore on unmount
             if (groupRef.current) {
                 groupRef.current.traverse((child) => {
                     if ((child as THREE.Mesh).isMesh) {
@@ -198,55 +222,55 @@ export function useCameraPresets() {
 export default function ModelViewer3D({
     glbUrl, viewMode, autoRotate = true, onMeshStats, screenshotTrigger = 0
 }: ModelViewer3DProps) {
-    const [error, setError] = useState<string | null>(null);
-
     if (!glbUrl) {
         return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#555' }}>No model loaded</div>;
     }
 
     return (
-        <Canvas
-            camera={{ position: [2, 2, 2], fov: 45 }}
-            gl={{ preserveDrawingBuffer: true, antialias: true }}
-            onCreated={({ gl }) => {
-                gl.outputColorSpace = THREE.SRGBColorSpace;
-                gl.toneMapping = THREE.ACESFilmicToneMapping;
-            }}
-            style={{ background: '#0a0a15' }}
-        >
-            <ambientLight intensity={0.4} />
-            <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
-            <directionalLight position={[-3, 4, -5]} intensity={0.4} />
+        <WebGLErrorBoundary fallbackUrl={glbUrl}>
+            <Canvas
+                camera={{ position: [2, 2, 2], fov: 45 }}
+                gl={{ preserveDrawingBuffer: true, antialias: true, powerPreference: 'default' }}
+                onCreated={({ gl }) => {
+                    gl.outputColorSpace = THREE.SRGBColorSpace;
+                    gl.toneMapping = THREE.ACESFilmicToneMapping;
+                }}
+                style={{ background: '#0a0a15' }}
+            >
+                <ambientLight intensity={0.4} />
+                <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
+                <directionalLight position={[-3, 4, -5]} intensity={0.4} />
 
-            <React.Suspense fallback={
-                <Html center><div style={{ color: '#888', fontSize: 14 }}>Loading model...</div></Html>
-            }>
-                <Model url={glbUrl} viewMode={viewMode} onStats={onMeshStats} />
-            </React.Suspense>
+                <React.Suspense fallback={
+                    <Html center><div style={{ color: '#888', fontSize: 14 }}>Loading model...</div></Html>
+                }>
+                    <Model url={glbUrl} viewMode={viewMode} onStats={onMeshStats} />
+                </React.Suspense>
 
-            <Grid
-                args={[20, 20]}
-                cellSize={0.5}
-                cellThickness={0.5}
-                cellColor="#2a2a4a"
-                sectionSize={2}
-                sectionThickness={1}
-                sectionColor="#3a3a5a"
-                fadeDistance={15}
-                fadeStrength={1}
-                infiniteGrid
-            />
+                <Grid
+                    args={[20, 20]}
+                    cellSize={0.5}
+                    cellThickness={0.5}
+                    cellColor="#2a2a4a"
+                    sectionSize={2}
+                    sectionThickness={1}
+                    sectionColor="#3a3a5a"
+                    fadeDistance={15}
+                    fadeStrength={1}
+                    infiniteGrid
+                />
 
-            <OrbitControls
-                autoRotate={autoRotate}
-                autoRotateSpeed={1}
-                enableDamping
-                dampingFactor={0.1}
-                minDistance={0.5}
-                maxDistance={20}
-            />
+                <OrbitControls
+                    autoRotate={autoRotate}
+                    autoRotateSpeed={1}
+                    enableDamping
+                    dampingFactor={0.1}
+                    minDistance={0.5}
+                    maxDistance={20}
+                />
 
-            <ScreenshotCapture trigger={screenshotTrigger} onCapture={() => {}} />
-        </Canvas>
+                <ScreenshotCapture trigger={screenshotTrigger} onCapture={() => {}} />
+            </Canvas>
+        </WebGLErrorBoundary>
     );
 }
