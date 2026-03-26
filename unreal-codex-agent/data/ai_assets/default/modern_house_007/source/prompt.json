@@ -1,0 +1,33 @@
+{
+  "prompt": "generate me  a modern house",
+  "asset_name": "modern_house",
+  "category": "architecture",
+  "purpose": "residential building",
+  "required_components": [
+    "walls",
+    "roof",
+    "doors",
+    "windows"
+  ],
+  "expected_silhouette": "rectangular with sloping roof",
+  "scale_range_cm": {
+    "min_width": 600,
+    "max_width": 1200,
+    "min_height": 300,
+    "max_height": 600,
+    "min_depth": 400,
+    "max_depth": 1000
+  },
+  "interior_required": true,
+  "failure_conditions": [
+    "too small",
+    "lacking doors or windows",
+    "inconsistent scale"
+  ],
+  "style": "modern",
+  "color_palette": [
+    "#FFFFFF",
+    "#808080",
+    "#454545"
+  ]
+}

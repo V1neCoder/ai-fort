@@ -23,21 +23,69 @@ def build_mesh(code: str, asset_name: str, export_dir: Path, version: int = 1) -
     """
     try:
         import trimesh
+        import trimesh.transformations
+        import trimesh.boolean
+        import trimesh.creation
+        import trimesh.util
         import numpy as np
         import math
     except ImportError as e:
         return {"success": False, "error": f"Missing dependency: {e}"}
 
+    # Optional: shapely for extrusions
+    try:
+        import shapely
+        import shapely.geometry
+    except ImportError:
+        shapely = None
+
     export_dir.mkdir(parents=True, exist_ok=True)
 
+    # Allowed modules for the restricted __import__
+    _allowed_modules = {
+        "trimesh": trimesh,
+        "trimesh.transformations": trimesh.transformations,
+        "trimesh.boolean": trimesh.boolean,
+        "trimesh.creation": trimesh.creation,
+        "trimesh.util": trimesh.util,
+        "numpy": np,
+        "np": np,
+        "math": math,
+    }
+    if shapely:
+        _allowed_modules["shapely"] = shapely
+        _allowed_modules["shapely.geometry"] = shapely.geometry
+
+    def _restricted_import(name, globals=None, locals=None, fromlist=(), level=0):
+        """Only allow importing pre-approved modules."""
+        if name in _allowed_modules:
+            mod = _allowed_modules[name]
+            return mod
+        # Check if it's a submodule of an allowed top-level
+        top = name.split(".")[0]
+        if top in ("trimesh", "numpy", "math") or (shapely and top == "shapely"):
+            import importlib
+            try:
+                mod = importlib.import_module(name)
+                _allowed_modules[name] = mod
+                return mod
+            except ImportError:
+                pass
+        raise ImportError(f"Import not allowed: {name}")
+
     # Build restricted namespace
+    builtins = _safe_builtins()
+    builtins["__import__"] = _restricted_import
+
     namespace: dict[str, Any] = {
         "trimesh": trimesh,
         "np": np,
         "numpy": np,
         "math": math,
-        "__builtins__": _safe_builtins(),
+        "__builtins__": builtins,
     }
+    if shapely:
+        namespace["shapely"] = shapely
 
     # Capture stdout/stderr from exec
     old_stdout, old_stderr = sys.stdout, sys.stderr
@@ -168,20 +216,25 @@ def validate_code_safety(code: str) -> tuple[bool, str]:
 
     Returns (is_safe, reason).
     """
+    # Allowed import targets — these are fine
+    safe_imports = {"trimesh", "numpy", "np", "math", "shapely"}
+
+    for line in code.split("\n"):
+        stripped = line.strip()
+        # Check import statements
+        if stripped.startswith("import ") or stripped.startswith("from "):
+            # Extract the top-level module name
+            parts = stripped.replace("from ", "").replace("import ", "").split(".")
+            top_module = parts[0].split()[0].strip(",")
+            if top_module not in safe_imports:
+                return False, f"Import not allowed: {top_module}"
+
     dangerous_patterns = [
-        ("import os", "os module not allowed"),
-        ("import sys", "sys module not allowed"),
-        ("import subprocess", "subprocess not allowed"),
-        ("import shutil", "shutil not allowed"),
-        ("__import__", "dynamic imports not allowed"),
         ("eval(", "eval not allowed"),
         ("exec(", "nested exec not allowed"),
         ("open(", "file I/O not allowed"),
-        ("pathlib", "pathlib not allowed"),
-        ("socket", "network access not allowed"),
-        ("urllib", "network access not allowed"),
-        ("requests", "network access not allowed"),
-        ("http", "network access not allowed"),
+        ("socket.", "network access not allowed"),
+        ("subprocess", "subprocess not allowed"),
     ]
 
     for pattern, reason in dangerous_patterns:
