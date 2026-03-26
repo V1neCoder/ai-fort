@@ -60,6 +60,8 @@ class ValidationCheck:
     passed: bool
     score: float  # 0.0 - 1.0
     detail: str = ""
+    description: str = ""
+    weight: float = 1.0
 
 
 @dataclass

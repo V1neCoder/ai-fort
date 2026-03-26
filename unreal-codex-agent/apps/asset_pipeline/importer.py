@@ -37,14 +37,14 @@ def import_to_uefn(
     target_path = CATEGORY_PATHS.get(record.category, "/Game/Generated/Props/")
     uefn_path = f"{target_path}{record.name}"
 
-    # Build MCP command
+    # Build MCP command matching UEFN Toolbelt bridge protocol
     command = {
-        "tool": "import_asset",
+        "command": "import_asset",
         "params": {
-            "source_path": str(Path(record.glb_path).resolve()),
-            "destination": uefn_path,
-            "asset_name": record.name,
-            "asset_type": "StaticMesh",
+            "source_file": str(Path(record.glb_path).resolve()),
+            "destination_path": uefn_path,
+            "replace_existing": True,
+            "save": True,
         },
     }
 
@@ -53,9 +53,10 @@ def import_to_uefn(
 
         body = json.dumps(command).encode()
         req = urllib.request.Request(
-            f"{mcp_url}/execute",
+            mcp_url,
             data=body,
             headers={"Content-Type": "application/json"},
+            method="POST",
         )
 
         with urllib.request.urlopen(req, timeout=30) as resp:

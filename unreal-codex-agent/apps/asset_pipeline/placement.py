@@ -10,8 +10,8 @@ from .models import AssetRecord
 from .ai_client import chat
 
 
-# Default MCP bridge URL (UEFN Toolbelt)
-DEFAULT_MCP_URL = "http://127.0.0.1:8765/execute"
+# Default MCP bridge URL (UEFN Toolbelt — POST to root, no /execute path)
+DEFAULT_MCP_URL = "http://127.0.0.1:8765"
 
 
 def query_scene_context(mcp_url: str = DEFAULT_MCP_URL) -> dict[str, Any]:
@@ -22,7 +22,7 @@ def query_scene_context(mcp_url: str = DEFAULT_MCP_URL) -> dict[str, Any]:
     try:
         # Get all actors in the current level
         payload = json.dumps({
-            "tool": "get_all_actors",
+            "command": "get_all_actors",
             "params": {}
         }).encode()
         req = urllib.request.Request(
@@ -182,13 +182,11 @@ def place_asset(
     rot = rotation or {"yaw": 0, "pitch": 0, "roll": 0}
 
     payload = json.dumps({
-        "tool": "place_actor",
+        "command": "spawn_actor",
         "params": {
             "asset_path": record.uefn_import_path,
             "location": [position.get("x", 0), position.get("y", 0), position.get("z", 0)],
             "rotation": [rot.get("pitch", 0), rot.get("yaw", 0), rot.get("roll", 0)],
-            "scale": [scale, scale, scale],
-            "label": record.name,
         }
     }).encode()
 

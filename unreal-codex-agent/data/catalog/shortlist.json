@@ -90,5 +90,41 @@
     "pipeline_asset": true,
     "pipeline_id": "0bd0f3b5b386",
     "pipeline_status": "approved"
+  },
+  {
+    "id": "4ddb19d77248",
+    "name": "Wooden Crate 005",
+    "type": "prop",
+    "category": "prop",
+    "description": "create  a  crate",
+    "tags": [
+      "prop",
+      "rustic",
+      "ai-generated"
+    ],
+    "dimensions": {
+      "min": [
+        -35.0,
+        -35.0,
+        -2.5
+      ],
+      "max": [
+        30.0,
+        30.0,
+        57.5
+      ],
+      "size": [
+        65.0,
+        65.0,
+        60.0
+      ]
+    },
+    "trust_score": 0.5,
+    "composite_asset": false,
+    "viewer_model_url": "/ai_assets/default/wooden_crate_005/exports/wooden_crate_005_v1.glb",
+    "viewer_note": "AI Generated v1 — approved",
+    "pipeline_asset": true,
+    "pipeline_id": "4ddb19d77248",
+    "pipeline_status": "approved"
   }
 ]
