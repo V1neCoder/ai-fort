@@ -139,7 +139,8 @@ def _safe_builtins() -> dict[str, Any]:
     import builtins
 
     allowed = [
-        "abs", "all", "any", "bool", "dict", "dir", "divmod", "enumerate",
+        "abs", "all", "any", "bool", "bytes", "bytearray", "callable",
+        "chr", "complex", "dict", "dir", "divmod", "enumerate",
         "filter", "float", "format", "frozenset", "getattr", "hasattr",
         "hash", "hex", "id", "int", "isinstance", "issubclass", "iter",
         "len", "list", "map", "max", "min", "next", "object", "oct",
@@ -149,6 +150,8 @@ def _safe_builtins() -> dict[str, Any]:
         "True", "False", "None",
         "Exception", "ValueError", "TypeError", "KeyError", "IndexError",
         "RuntimeError", "StopIteration", "AttributeError", "ZeroDivisionError",
+        "NotImplementedError", "OverflowError", "ArithmeticError",
+        "__build_class__", "__name__",
     ]
 
     safe = {}

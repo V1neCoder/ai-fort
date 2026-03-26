@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
     Search, Filter, Grid, List, Box, Eye, Wand2, Upload,
-    Tag, ChevronRight, RefreshCw, CheckCircle, XCircle, AlertTriangle
+    Tag, ChevronRight, RefreshCw, CheckCircle, XCircle, AlertTriangle, Trash2
 } from 'lucide-react';
 import useAppStore from '../../store/useAppStore';
 import { useNavigate } from 'react-router-dom';
@@ -79,6 +79,15 @@ export default function AssetsView({ backendUrl }: Props) {
     const openInModelAI = (assetId: string) => {
         navigateTo('/model-ai', assetId);
         navigate('/model-ai');
+    };
+
+    const handleDelete = async (assetId: string) => {
+        if (!window.confirm('Delete this asset? This cannot be undone.')) return;
+        try {
+            await axios.delete(`${backendUrl}/api/pipeline/delete/${assetId}`);
+            if (selectedAssetId === assetId) selectAsset('');
+            fetchAssets();
+        } catch { /* ignore */ }
     };
 
     return (
@@ -180,6 +189,9 @@ export default function AssetsView({ backendUrl }: Props) {
                             </button>
                             <button className="av2-action pipeline" onClick={() => { navigateTo('/pipeline', selected.asset_id); navigate('/pipeline'); }}>
                                 <Wand2 size={16} /> Send to Pipeline
+                            </button>
+                            <button className="av2-action delete" onClick={() => handleDelete(selected.asset_id)}>
+                                <Trash2 size={16} /> Delete
                             </button>
                         </div>
                     </div>

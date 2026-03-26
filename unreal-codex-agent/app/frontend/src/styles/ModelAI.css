@@ -78,6 +78,8 @@
 .mai-approve-btn:hover { background: #4cae4c; }
 .mai-import-btn { padding: 8px 16px; background: #337ab7; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
 .mai-import-btn:hover { background: #286090; }
+.mai-delete-btn { padding: 8px 16px; background: transparent; color: #d9534f; border: 1px solid #d9534f; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.mai-delete-btn:hover { background: rgba(217,83,79,0.15); }
 
 /* Responsive */
 @media (max-width: 768px) {

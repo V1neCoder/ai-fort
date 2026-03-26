@@ -68,6 +68,14 @@ export default function PipelineView({ backendUrl }: Props) {
         navigate('/model-ai');
     };
 
+    const handleDeleteAsset = async (assetId: string) => {
+        if (!window.confirm('Delete this asset and all its files?')) return;
+        try {
+            await axios.delete(`${backendUrl}/api/pipeline/delete/${assetId}`);
+            fetchJobs();
+        } catch { /* ignore */ }
+    };
+
     const glbUrl = (result: any) => {
         if (!result?.glb_path) return '';
         const path = result.glb_path.replace(/\\/g, '/');
@@ -205,6 +213,9 @@ export default function PipelineView({ backendUrl }: Props) {
                                     </button>
                                     <button className="pv2-action-btn assets" onClick={() => { navigateTo('/assets', selectedJob.result.asset_id); navigate('/assets'); }}>
                                         <Box size={16} /> View in Assets
+                                    </button>
+                                    <button className="pv2-action-btn danger" onClick={() => handleDeleteAsset(selectedJob.result.asset_id)}>
+                                        <Trash2 size={16} /> Delete Asset
                                     </button>
                                 </div>
                             )}

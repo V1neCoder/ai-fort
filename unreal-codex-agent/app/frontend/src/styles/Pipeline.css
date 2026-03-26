@@ -64,6 +64,8 @@
 .pv2-action-btn.model-ai:hover { background: rgba(124,92,191,0.1); }
 .pv2-action-btn.assets { border-color: #337ab7; color: #5fa8d3; }
 .pv2-action-btn.assets:hover { background: rgba(51,122,183,0.1); }
+.pv2-action-btn.danger { border-color: #d9534f; color: #d9534f; }
+.pv2-action-btn.danger:hover { background: rgba(217,83,79,0.15); }
 
 @media (max-width: 768px) {
     .pv2-content { flex-direction: column; }

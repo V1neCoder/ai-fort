@@ -110,9 +110,16 @@ class JobManager:
                 on_progress=on_progress,
             )
             job.result = result
-            job.status = "completed"
             job.progress = 1.0
-            job.progress_message = "Done"
+            # Check if pipeline itself reported failure
+            pipeline_status = result.get("status", "")
+            if pipeline_status in ("build_failed", "generation_failed", "error"):
+                job.status = "failed"
+                job.error = result.get("error", f"Pipeline status: {pipeline_status}")
+                job.progress_message = f"Failed: {job.error}"
+            else:
+                job.status = "completed"
+                job.progress_message = "Done"
         except InterruptedError:
             job.status = "cancelled"
             job.progress_message = "Cancelled"

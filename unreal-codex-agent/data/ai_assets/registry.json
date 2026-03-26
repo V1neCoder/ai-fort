@@ -294,6 +294,82 @@
       "vertex_count": 0,
       "face_count": 0,
       "bounds_cm": {}
+    },
+    {
+      "asset_id": "df56666cc9e3",
+      "name": "modern_house_006",
+      "category": "architecture",
+      "project": "default",
+      "prompt": "CREATE  A MODERN HOUSE",
+      "spec": {
+        "prompt": "CREATE  A MODERN HOUSE",
+        "asset_name": "modern_house",
+        "category": "architecture",
+        "purpose": "residential dwelling",
+        "required_components": [
+          "walls",
+          "roof",
+          "doors",
+          "windows",
+          "foundation"
+        ],
+        "expected_silhouette": "rectangular with sloping roof",
+        "scale_range_cm": {
+          "min_width": 600,
+          "max_width": 1200,
+          "min_height": 400,
+          "max_height": 700,
+          "min_depth": 400,
+          "max_depth": 800
+        },
+        "interior_required": true,
+        "failure_conditions": [
+          "incorrect proportions",
+          "missing essential components",
+          "inconsistent style"
+        ],
+        "style": "modern",
+        "color_palette": [
+          "#FFFFFF",
+          "#808080",
+          "#454545",
+          "#66CCCC"
+        ]
+      },
+      "version": 4,
+      "status": "build_failed",
+      "created_at": "2026-03-26T05:59:00.544324+00:00",
+      "updated_at": "2026-03-26T05:59:09.373841+00:00",
+      "glb_path": "",
+      "preview_screenshots": [],
+      "generated_code": "",
+      "validation_results": [],
+      "fix_history": [
+        {
+          "attempt": 1,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 2,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        },
+        {
+          "attempt": 3,
+          "action": "build_failed",
+          "error": "Code execution failed: __import__ not found"
+        }
+      ],
+      "latest_validation": {},
+      "uefn_import_path": "",
+      "imported_at": "",
+      "reference_images": [],
+      "tags": [],
+      "generation_provider": "",
+      "vertex_count": 0,
+      "face_count": 0,
+      "bounds_cm": {}
     }
   ]
 }

@@ -104,19 +104,41 @@ export default function ModelAIView({ backendUrl }: Props) {
         }
     };
 
+    const [actionError, setActionError] = useState('');
+
     const handleApprove = async () => {
         if (!asset) return;
+        setActionError('');
         try {
             await axios.post(`${backendUrl}/api/pipeline/approve/${asset.asset_id}`);
             fetchAsset();
-        } catch { /* ignore */ }
+        } catch (e: any) {
+            setActionError(e.response?.data?.error || 'Approve failed');
+        }
     };
 
     const handleImport = async () => {
         if (!asset) return;
+        setActionError('');
         try {
-            await axios.post(`${backendUrl}/api/pipeline/import/${asset.asset_id}`);
-            fetchAsset();
+            const res = await axios.post(`${backendUrl}/api/pipeline/import/${asset.asset_id}`);
+            if (res.data?.success) {
+                fetchAsset();
+            } else {
+                setActionError(res.data?.error || 'Import failed');
+            }
+        } catch (e: any) {
+            setActionError(e.response?.data?.error || 'Import failed — is UEFN running with MCP bridge active?');
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!asset) return;
+        if (!window.confirm(`Delete "${asset.name}"? This cannot be undone.`)) return;
+        try {
+            await axios.delete(`${backendUrl}/api/pipeline/delete/${asset.asset_id}`);
+            selectAsset('');
+            setAsset(null);
         } catch { /* ignore */ }
     };
 
@@ -246,6 +268,7 @@ export default function ModelAIView({ backendUrl }: Props) {
                                     <p className="mai-hint">No validation results yet.</p>
                                 )}
 
+                                {actionError && <div className="mai-edit-error">{actionError}</div>}
                                 <div className="mai-val-actions">
                                     {asset.status !== 'approved' && asset.status !== 'imported' && (
                                         <button className="mai-approve-btn" onClick={handleApprove}>Approve</button>
@@ -253,6 +276,7 @@ export default function ModelAIView({ backendUrl }: Props) {
                                     {asset.status === 'approved' && (
                                         <button className="mai-import-btn" onClick={handleImport}>Import to UEFN</button>
                                     )}
+                                    <button className="mai-delete-btn" onClick={handleDelete}>Delete</button>
                                 </div>
                             </div>
                         )}

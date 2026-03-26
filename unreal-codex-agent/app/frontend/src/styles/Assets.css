@@ -54,6 +54,8 @@
 .av2-action:hover { background: #2a2a45; }
 .av2-action.model-ai { border-color: #7c5cbf; color: #b49aed; }
 .av2-action.pipeline { border-color: #f0ad4e; color: #f0ad4e; }
+.av2-action.delete { border-color: #d9534f; color: #d9534f; }
+.av2-action.delete:hover { background: rgba(217, 83, 79, 0.15); }
 
 @media (max-width: 768px) {
     .av2-content { flex-direction: column; }
