@@ -101,7 +101,7 @@ class AssetPipeline:
 
             # Build mesh
             _progress(f"Building 3D mesh (attempt {attempt})...", 0.40 + (attempt - 1) * 0.05)
-            export_dir = self.storage.exports_dir(project, record.name)
+            export_dir = self.storage.export_dir(project, record.name)
             try:
                 build_result = build_mesh(code, record.name, export_dir, record.version)
             except Exception as e:
@@ -143,7 +143,7 @@ class AssetPipeline:
 
             # Render previews
             _progress("Rendering preview screenshots...", 0.60)
-            preview_dir = self.storage.previews_dir(project, record.name)
+            preview_dir = self.storage.preview_dir(project, record.name)
             try:
                 screenshots = render_screenshots(build_result["glb_path"], preview_dir, record.version)
                 record = self.registry.update_previews(record, screenshots)
@@ -225,7 +225,7 @@ class AssetPipeline:
         if not spec:
             return {"error": "No spec found for asset"}
 
-        preview_dir = self.storage.previews_dir(record.project, record.name)
+        preview_dir = self.storage.preview_dir(record.project, record.name)
         screenshots = record.preview_screenshots
 
         # Re-render if no screenshots

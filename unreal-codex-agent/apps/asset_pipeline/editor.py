@@ -84,7 +84,7 @@ Apply this edit and output the complete updated code."""
 
     # Build new mesh
     record.version += 1
-    export_dir = registry.storage.exports_dir(record.project, record.name)
+    export_dir = registry.storage.export_dir(record.project, record.name)
     build_result = build_mesh(new_code, record.name, export_dir, record.version)
 
     if not build_result.get("success"):
@@ -102,7 +102,7 @@ Apply this edit and output the complete updated code."""
     )
 
     # Render previews
-    preview_dir = registry.storage.previews_dir(record.project, record.name)
+    preview_dir = registry.storage.preview_dir(record.project, record.name)
     try:
         screenshots = render_screenshots(build_result["glb_path"], preview_dir, record.version)
         record = registry.update_previews(record, screenshots)
@@ -140,7 +140,7 @@ def detect_problems(
         return {"error": "No vision provider available. Set GEMINI_API_KEY."}
 
     # Collect preview screenshots
-    preview_dir = registry.storage.previews_dir(record.project, record.name)
+    preview_dir = registry.storage.preview_dir(record.project, record.name)
     image_paths = []
     for name in (record.preview_screenshots or []):
         p = preview_dir / name
